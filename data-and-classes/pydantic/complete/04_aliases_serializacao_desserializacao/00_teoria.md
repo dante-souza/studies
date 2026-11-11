@@ -4,6 +4,7 @@
 > [`04`](04_desserializando_por_nome_ou_alias.ipynb) por nome ou alias · [`05`](05_aliases_de_serializacao.ipynb) aliases de serialização ·
 > [`06`](06_aliases_de_validacao.ipynb) aliases de validação · [`07`](07_serializadores_customizados.ipynb) serializadores customizados ·
 > projeto: [`08`](08_projeto.ipynb) · [`09`](09_projeto_solucao_instrutor.ipynb) · [`10`](10_projeto_solucao_comentada.ipynb)
+> ⚠️ Pegadinhas, efeitos colaterais e caveats da seção: [`99_pegadinhas_e_caveats`](99_pegadinhas_e_caveats.ipynb)
 
 ## Ideia central
 

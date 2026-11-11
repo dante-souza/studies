@@ -3,6 +3,8 @@
 > Versão de referência: **Python 3.13** (módulo `enum` da biblioteca padrão; versão mínima indicada quando > 3.4).
 > Notebooks deste módulo: [`01_enum_basico`](01_enum_basico.ipynb) · [`02_enum_intermediario`](02_enum_intermediario.ipynb) · [`03_enum_avancado`](03_enum_avancado.ipynb)
 
+> Cada notebook termina com uma seção **⚠️ Pegadinhas, efeitos colaterais e caveats** (as já vistas no corpo + novas, com demonstração).
+
 ---
 
 ## 1. O que é

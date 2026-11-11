@@ -4,6 +4,7 @@
 > [`04`](04_validando_argumentos_de_funcoes.ipynb) validando argumentos de funções · [`05`](05_geradores_de_codigo_de_modelos.ipynb)
 > geradores de código de modelos. Dados: `pop_estimates.csv`, `csv_data.csv`, `rectangle_data.json`, `schema_1/2/3.json`,
 > `geojs_samples.json` (respostas gravadas da API, para rodar offline).
+> ⚠️ Pegadinhas, efeitos colaterais e caveats da seção: [`99_pegadinhas_e_caveats`](99_pegadinhas_e_caveats.ipynb)
 
 ## Onde o Pydantic entra numa aplicação
 

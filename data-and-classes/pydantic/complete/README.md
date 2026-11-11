@@ -11,6 +11,7 @@ Material do curso **[Pydantic V2: Essentials](https://www.udemy.com/course/pydan
 - **todos os projetos resolvidos**: para cada seção há o enunciado, a solução do instrutor (traduzida e revisada) e uma
   **solução comentada** própria, com testes extras e comparação com a do instrutor;
 - um **`00_teoria.md`** por seção, com o resumo conceitual e as divergências encontradas.
+- um **`99_pegadinhas_e_caveats`** por seção: as notas de revisão da seção num quadro e pegadinhas novas, com demonstração.
 
 ## Como rodar
 

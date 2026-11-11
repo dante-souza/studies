@@ -1,0 +1,9 @@
+# Curso "Pydantic V2: Essentials" (pasta complete/) — Python >= 3.12 (executado em 3.13)
+pydantic>=2.11,<3          # notebooks executados com 2.13.5; conferidos também na 2.14.3
+email-validator>=2         # EmailStr / NameEmail
+python-dateutil>=2.8       # parse de datas livres ("1/1/2020 3pm")
+pytz                       # usado pelo curso (as notas mostram a alternativa da stdlib)
+pyyaml>=6                  # seção 3 (configuração via YAML)
+requests>=2.31             # seção 12 (API REST)
+datamodel-code-generator>=0.25   # seção 12 (geradores de código)
+jupyterlab>=4

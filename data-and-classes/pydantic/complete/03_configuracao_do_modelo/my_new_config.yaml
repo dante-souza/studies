@@ -1,0 +1,6 @@
+fruits:
+  - apple
+  - banana
+  - cherry
+max_size: 42
+favorite_fruit: apple

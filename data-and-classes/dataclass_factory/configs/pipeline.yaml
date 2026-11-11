@@ -1,0 +1,20 @@
+# Caso completo (notebook 06): pipeline de exportação — camada base
+pipeline:
+  name: vendas-diarias
+  environment: dev
+  log_level: info
+  source:
+    kind: csv
+    path: vendas.csv
+    delimiter: ";"
+  transforms:
+    - kind: filter
+      field: regiao
+      equals: sul
+    - kind: min_value
+      value: "50"
+  sinks:
+    - kind: file
+      path: saida/vendas.jsonl
+    - kind: console
+      max_rows: 2

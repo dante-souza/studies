@@ -1,0 +1,12 @@
+ data_config:
+   validate_assignment: True
+   validate_default: True
+   extra: allow    # allow extra arguments. options are ignore (default) and forbid
+   frozen: False     # data model mutability. if True, data model will be immutable but hashable. model can be used as dict keys.
+   strict: True
+   coerce_numbers_to_str: True
+   str_strip_whitespace: True
+   str_to_lower: True
+   str_to_upper: False
+   use_enum_values: True  # just want the value of the enum, instead of the enum member itself. default is False
+   populate_by_name: True  # we can use either the field name or the alias

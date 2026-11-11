@@ -5,6 +5,7 @@
 > obrigatórios × opcionais · [`07`](07_campos_anulaveis.ipynb) anuláveis · [`08`](08_combinando_anulavel_e_opcional.ipynb) anulável + opcional ·
 > [`09`](09_inspecionando_campos.ipynb) inspecionando campos · [`10`](10_geracao_de_json_schema.ipynb) JSON Schema ·
 > projeto: [`11`](11_projeto.ipynb) · [`12`](12_projeto_solucao_instrutor.ipynb) · [`13`](13_projeto_solucao_comentada.ipynb)
+> ⚠️ Pegadinhas, efeitos colaterais e caveats da seção: [`99_pegadinhas_e_caveats`](99_pegadinhas_e_caveats.ipynb)
 
 ## Ideia central
 

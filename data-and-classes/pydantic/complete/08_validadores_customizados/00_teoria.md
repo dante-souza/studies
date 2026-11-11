@@ -4,6 +4,7 @@
 > *before* · [`04`](04_validadores_before_e_after.ipynb) *before* + *after* · [`05`](05_validadores_com_annotated.ipynb) com `Annotated` ·
 > [`06`](06_validacoes_dependentes_de_campos.ipynb) dependentes de campos · projeto: [`07`](07_projeto.ipynb) ·
 > [`08`](08_projeto_solucao_instrutor.ipynb) · [`09`](09_projeto_solucao_comentada.ipynb)
+> ⚠️ Pegadinhas, efeitos colaterais e caveats da seção: [`99_pegadinhas_e_caveats`](99_pegadinhas_e_caveats.ipynb)
 
 ## Ideia central
 

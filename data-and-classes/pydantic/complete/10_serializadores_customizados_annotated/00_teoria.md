@@ -2,6 +2,7 @@
 
 > Notebooks: [`02`](02_serializadores_customizados.ipynb) serializadores customizados · projeto: [`03`](03_projeto.ipynb) ·
 > [`04`](04_projeto_solucao_instrutor.ipynb) · [`05`](05_projeto_solucao_comentada.ipynb)
+> ⚠️ Pegadinhas, efeitos colaterais e caveats da seção: [`99_pegadinhas_e_caveats`](99_pegadinhas_e_caveats.ipynb)
 
 ## Ideia central
 

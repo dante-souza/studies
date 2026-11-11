@@ -2,6 +2,7 @@
 
 > Notebooks: [`02`](02_propriedades.ipynb) propriedades · [`03`](03_computed_fields.ipynb) computed fields · projeto: [`04`](04_projeto.ipynb) ·
 > [`05`](05_projeto_solucao_instrutor.ipynb) · [`06`](06_projeto_solucao_comentada.ipynb)
+> ⚠️ Pegadinhas, efeitos colaterais e caveats da seção: [`99_pegadinhas_e_caveats`](99_pegadinhas_e_caveats.ipynb)
 
 ## Ideia central
 

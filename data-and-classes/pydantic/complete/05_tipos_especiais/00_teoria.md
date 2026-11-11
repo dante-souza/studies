@@ -3,6 +3,7 @@
 > Notebooks: [`01`](01_links_da_documentacao.ipynb) links · [`02`](02_positiveint.ipynb) `PositiveInt` · [`03`](03_listas_com_restricoes.ipynb)
 > listas com restrições · [`04`](04_uuid.ipynb) UUID · [`05`](05_tipos_de_data.ipynb) datas · [`06`](06_tipos_de_rede.ipynb) rede ·
 > projeto: [`07`](07_projeto.ipynb) · [`08`](08_projeto_solucao_instrutor.ipynb) · [`09`](09_projeto_solucao_comentada.ipynb)
+> ⚠️ Pegadinhas, efeitos colaterais e caveats da seção: [`99_pegadinhas_e_caveats`](99_pegadinhas_e_caveats.ipynb)
 
 ## Ideia central
 

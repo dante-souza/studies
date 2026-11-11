@@ -5,6 +5,7 @@
 > [`06`](06_mutabilidade.ipynb) mutabilidade · [`07`](07_convertendo_numeros_em_strings.ipynb) números → strings ·
 > [`08`](08_padronizando_strings.ipynb) padronizando strings · [`09`](09_tratando_enums_python.ipynb) enums ·
 > projeto: [`10`](10_projeto.ipynb) · [`11`](11_projeto_solucao_instrutor.ipynb) · [`12`](12_projeto_solucao_comentada.ipynb)
+> ⚠️ Pegadinhas, efeitos colaterais e caveats da seção: [`99_pegadinhas_e_caveats`](99_pegadinhas_e_caveats.ipynb)
 
 ## Ideia central
 

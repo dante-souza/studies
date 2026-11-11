@@ -6,3 +6,4 @@ fastapi>=0.115
 httpx>=0.27          # TestClient do FastAPI
 jupyterlab>=4
 nbconvert>=7
+sqlalchemy>=2.0      # enum/03: persistência de Enum via ORM

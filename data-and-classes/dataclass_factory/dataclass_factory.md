@@ -142,6 +142,24 @@ Pipeline de exportação: camadas YAML → `PipelineSpec` (uniões discriminadas
 produção no modelo) → registro `Spec → componente` com teste de cobertura → componentes dataclass → `Venda` validada linha a linha com
 número da linha → sinks. Erros de configuração chegam com caminho e camadas envolvidas; ruído de `too_short` em coleções é filtrado.
 
+## Índice de pegadinhas, efeitos colaterais e caveats
+
+Cada notebook termina com uma seção **"⚠️ Pegadinhas, efeitos colaterais e caveats"**: um quadro das que aparecem no corpo e as
+novas, cada uma com demonstração executável e a forma de evitar.
+
+| notebook | novas na seção final |
+|---|---|
+| [01](01_formatos_de_configuracao.ipynb) | âncoras YAML compartilham o objeto · chaves duplicadas (última vence; loader/hook que recusam) · comentário inline no INI vira valor · `NaN`/`Infinity` no JSON e no `float` do Pydantic (`FiniteFloat`) · `.env` expande `${VAR}` até entre aspas simples · YAML vazio = `None`, data impossível estoura no parser · `float` para dinheiro · codificação |
+| [02](02_factory_pattern.ipynb) | *late binding* de `lambda` no registro · `__init_subclass__` obrigatório impede bases intermediárias · `kind` com default não dispensa a tag na entrada · união sem discriminador escolhe por heurística (erro de digitação cai na classe errada) · registro global vaza entre testes · `@cache` em fábrica compartilha objeto mutável · atributo mutável em membro de Enum é estado global |
+| [03](03_configuracao_tipada.ipynb) | lista via env precisa ser JSON · `bool` vazio no env derruba a carga · `SecretStr` + dump + recarga = senha `**********` · `@lru_cache` em `get_settings()` congela a configuração · caminho relativo ao cwd, não ao arquivo · `os.environ` vaza entre testes |
+| [04](04_politicas_e_presets.ipynb) | `validate_assignment` não vê `append` · `alias_generator` só na saída com `by_alias` (`serialize_by_alias`) · `str_to_lower` não vale para Enum · `model_copy(update=)`/`model_construct` pulam validação mesmo em `frozen` · `use_enum_values` com default deixa tipos misturados · herança de `model_config` e raio de impacto do preset |
+| [05](05_modelos_a_partir_de_especificacao.ipynb) | **injeção de código pelo gerador** · dois campos disputando o mesmo alias (ambos preenchidos) · campo que sombreia o `BaseModel` · valores de enum que colapsam no mesmo nome · cache de imports após regenerar · executar configuração = mudar contrato sem revisão |
+| [06](06_caso_completo.ipynb) | número BRL ingênuo erra 10× (`"1.5"` → `15`) · seção vazia numa camada apaga a de baixo · gerador consumido duas vezes · CSV irregular (`None` como chave) · efeitos parciais entre destinos · reexecução sobrescreve a saída |
+
+Seis desses itens eram **bugs do próprio material**, achados ao escrever esta seção e corrigidos no código principal (a seção de
+caveats mostra a versão ingênua e a corrigida): injeção no gerador, colisão de alias e sombreamento não detectados pelo
+meta-modelo, colapso de nomes de enum (05); conversão BRL ambígua e merge com seção vazia (06).
+
 ## Checklist
 
 - [ ] `safe_load`; strings ambíguas entre aspas no YAML
@@ -151,4 +169,6 @@ número da linha → sinks. Erros de configuração chegam com caminho e camadas
 - [ ] configuração congelada em **todos** os níveis
 - [ ] segredos fora do repositório, em `SecretStr`
 - [ ] nada que mude o contrato variando por ambiente
-- [ ] código gerado versionado + teste "regenerar não muda nada"
+- [ ] código gerado versionado + teste "regenerar não muda nada"; textos da especificação entram só via `repr`
+- [ ] coleções em configuração como `tuple`; nada de mutar o que foi carregado
+- [ ] efeitos colaterais (escrita, rede) só depois de **toda** a validação; destinos idempotentes ou com relatório por destino

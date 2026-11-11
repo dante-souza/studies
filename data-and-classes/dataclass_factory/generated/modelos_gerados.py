@@ -32,7 +32,7 @@ class RegistrationCountry(BaseModel):
 
 
 class Automobile(BaseModel):
-    """Carro do projeto do curso"""
+    'Carro do projeto do curso'
     model_config = ConfigDict(extra='forbid', str_strip_whitespace=True, validate_assignment=True, alias_generator=to_camel, validate_by_name=True)
 
     manufacturer: Annotated[str, Field(min_length=2, max_length=50), BeforeValidator(NORMALIZERS['strip_title'])]
@@ -44,7 +44,7 @@ class Automobile(BaseModel):
 
 
 class ServiceTicket(BaseModel):
-    """Chamado de manutenção"""
+    'Chamado de manutenção'
     model_config = ConfigDict(extra='forbid', str_strip_whitespace=True, validate_assignment=True, alias_generator=to_camel, validate_by_name=True)
 
     vin: Annotated[str, Field(pattern='^[A-HJ-NPR-Z0-9]{17}$'), BeforeValidator(NORMALIZERS['upper'])]

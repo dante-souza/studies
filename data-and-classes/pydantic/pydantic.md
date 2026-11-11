@@ -2,6 +2,7 @@
 
 > Versão de referência: **Pydantic 2.13** + **pydantic-settings 2.16** (Python ≥ 3.10).
 > Notebooks deste módulo: [`01_pydantic_basico`](01_pydantic_basico.ipynb) · [`02_pydantic_intermediario`](02_pydantic_intermediario.ipynb) · [`03_pydantic_avancado`](03_pydantic_avancado.ipynb)
+> Curso completo (11 seções, aulas + projetos resolvidos): [`complete/`](complete/README.md)
 
 ---
 

@@ -14,7 +14,8 @@ data-and-classes/
 │   ├── pydantic.md               teoria: fronteira de confiança, pydantic-core, lax/strict, settings, DTOs de API
 │   ├── 01_pydantic_basico.ipynb
 │   ├── 02_pydantic_intermediario.ipynb
-│   └── 03_pydantic_avancado.ipynb
+│   ├── 03_pydantic_avancado.ipynb
+│   └── complete/                 curso "Pydantic V2: Essentials" (F. Baptiste) traduzido, revisado e com projetos resolvidos
 ├── dataclass/
 │   ├── dataclass.md              teoria: geração de código, field(), hash/frozen/slots, arquitetura de bordas
 │   ├── 01_dataclass_basico.ipynb

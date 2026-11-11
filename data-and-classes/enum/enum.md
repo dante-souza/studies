@@ -168,6 +168,8 @@ flowchart LR
 2. **`str()` e `format()` diferem entre tipos** — `str(Color.RED)` → `"Color.RED"` (Enum) mas `str(S.A)` → `"a"` (StrEnum). Em f-strings de log/SQL isso muda o resultado.
 3. **Aliases silenciosos** — dois membros com o mesmo valor: o segundo vira apelido e **some** da iteração. Use `@unique`.
 4. **`Flag` com valor que não é potência de 2** — vira um *alias de combinação* (`BLACK = 12` é `YELLOW | BLUE`) e também some da iteração.
+   Nenhum validador do `enum` barra isso (nem `@verify(NAMED_FLAGS)`, que só pega bits sem nome). Correção: `auto()` para opções
+   independentes; para combinação intencional, escreva com nomes (`BLACK = YELLOW | BLUE`) e teste os aliases esperados (código em `02_enum_intermediario`).
 5. **Persistir `name` ou posição** — renomear um membro ou reordenar quebra dados salvos. Persista o `value` e trate-o como contrato.
 6. **Anotar membros** — `RED: str = "R"` funciona em runtime, mas a especificação de tipagem pede **sem anotação** nos membros; type checkers reclamam.
 7. **`auto()` em `Enum` puro gera inteiros** (1, 2, 3...). Se os números forem persistidos, reordenar membros muda os valores. Em `StrEnum`, `auto()` gera o nome em minúsculas.

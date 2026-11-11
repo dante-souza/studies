@@ -3,6 +3,7 @@
 > Notebooks: [`02`](02_restricoes_numericas.ipynb) restrições numéricas · [`03`](03_restricoes_de_string.ipynb) restrições de string ·
 > [`04`](04_default_factories.ipynb) default factories · [`05`](05_configuracoes_adicionais_de_campo.ipynb) configurações adicionais ·
 > projeto: [`06`](06_projeto.ipynb) · [`07`](07_projeto_solucao_instrutor.ipynb) · [`08`](08_projeto_solucao_comentada.ipynb)
+> ⚠️ Pegadinhas, efeitos colaterais e caveats da seção: [`99_pegadinhas_e_caveats`](99_pegadinhas_e_caveats.ipynb)
 
 ## Ideia central
 

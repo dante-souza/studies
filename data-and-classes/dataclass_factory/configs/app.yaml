@@ -1,0 +1,15 @@
+# Configuração de exemplo: a MESMA informação em YAML, TOML, JSON, INI e .env
+app:
+  name: relatorios
+  environment: dev
+  debug: true
+server:
+  host: 0.0.0.0
+  port: 8080
+  timeout_s: 2.5
+database:
+  url: postgresql://localhost:5432/app
+  pool_size: 5
+release_date: 2026-01-15
+tags: [api, interno]
+log_level: info

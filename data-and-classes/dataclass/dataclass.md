@@ -3,6 +3,8 @@
 > Versão de referência: **Python 3.13** (`dataclasses` da biblioteca padrão; recursos marcados com a versão mínima quando > 3.7).
 > Notebooks deste módulo: [`01_dataclass_basico`](01_dataclass_basico.ipynb) · [`02_dataclass_intermediario`](02_dataclass_intermediario.ipynb) · [`03_dataclass_avancado`](03_dataclass_avancado.ipynb)
 
+> Cada notebook termina com uma seção **⚠️ Pegadinhas, efeitos colaterais e caveats** (as já vistas no corpo + novas, com demonstração).
+
 ---
 
 ## 1. O que é

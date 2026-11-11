@@ -3,6 +3,7 @@
 > Notebooks: [`02`](02_pydantic_e_tipos_annotated.ipynb) Pydantic e `Annotated` · [`03`](03_tipos_annotated_e_type_variables.ipynb)
 > `Annotated` e `TypeVar` · [`04`](04_restricoes_de_string.ipynb) restrições de string · projeto: [`05`](05_projeto.ipynb) ·
 > [`06`](06_projeto_solucao_instrutor.ipynb) · [`07`](07_projeto_solucao_comentada.ipynb)
+> ⚠️ Pegadinhas, efeitos colaterais e caveats da seção: [`99_pegadinhas_e_caveats`](99_pegadinhas_e_caveats.ipynb)
 
 ## Ideia central
 

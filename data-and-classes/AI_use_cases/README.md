@@ -5,6 +5,8 @@ Todos os notebooks rodam **offline**: `fake_llm.py` fornece um `ScriptedLLM` que
 (inclusive respostas **erradas**, para exercitar validação e retry). O código de chamada real aos SDKs aparece em
 células de referência.
 
+> Cada notebook tem uma seção **⚠️ Pegadinhas, efeitos colaterais e caveats** perto do fim, com demonstrações offline.
+
 ## Mapa
 
 | # | notebook | ferramenta | o que mostra |

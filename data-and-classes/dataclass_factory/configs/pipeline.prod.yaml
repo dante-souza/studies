@@ -1,0 +1,10 @@
+# Camada de produção: só o que muda. Listas SUBSTITUEM a lista da base (decisão explícita do merge).
+pipeline:
+  environment: prod
+  log_level: warning
+  sinks:
+    - kind: file
+      path: saida/vendas.jsonl
+    - kind: webhook
+      url: https://hooks.example.com/vendas
+      retries: 5

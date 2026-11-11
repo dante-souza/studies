@@ -1,0 +1,20 @@
+# Perfis de comportamento de modelos — validados por ModelPolicy / DataclassPolicy (notebook 04)
+model_profiles:
+  api_input:          # payload vindo de fora: rígido na forma, tolerante na apresentação
+    extra: forbid
+    str_strip_whitespace: true
+    validate_assignment: true
+    alias_generator: camel
+    validate_by_name: true
+  internal:           # objetos que circulam dentro do sistema
+    extra: forbid
+    frozen: true
+    strict: true
+  legacy_import:      # importação de planilhas antigas
+    extra: ignore
+    coerce_numbers_to_str: true
+    str_strip_whitespace: true
+
+dataclass_profiles:
+  value_object: {frozen: true, slots: true, kw_only: true}
+  record: {order: true, slots: true}

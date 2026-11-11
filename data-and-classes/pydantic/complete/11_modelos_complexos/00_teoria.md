@@ -2,6 +2,7 @@
 
 > Notebooks: [`02`](02_composicao_de_modelos.ipynb) composição · [`03`](03_heranca_de_modelos.ipynb) herança · projeto: [`04`](04_projeto.ipynb) ·
 > [`05`](05_projeto_solucao_instrutor.ipynb) · [`06`](06_projeto_solucao_final_instrutor.ipynb) · [`07`](07_projeto_solucao_comentada.ipynb)
+> ⚠️ Pegadinhas, efeitos colaterais e caveats da seção: [`99_pegadinhas_e_caveats`](99_pegadinhas_e_caveats.ipynb)
 
 ## Composição × herança
 

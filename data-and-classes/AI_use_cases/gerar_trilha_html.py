@@ -157,10 +157,14 @@ def montar_notebook(nb_info: Notebook, ancoras: dict[str, str]) -> None:
             continue
         api = "skip-execution" in celula.metadata.get("tags", [])
         contagem = celula.get("execution_count")
-        rotulo = "API, não executada (precisa do .env)" if api else (f"[{contagem}]" if contagem else "")
+        if api:
+            rotulo = f"[{contagem}] API, executada com o .env" if contagem else "API, não executada (precisa do .env)"
+        else:
+            rotulo = f"[{contagem}]" if contagem else ""
         saidas = "".join(f'<pre class="saida">{ansi_para_html(t)}</pre>'
                          for t in (texto_da_saida(s) for s in celula.get("outputs", [])) if t and t.strip())
-        classes = "celula" + (" api" if api else "") + (" pegadinha" if pegadinha else "")
+        classes = ("celula" + (" api" if api else "") + (" nao-executada" if api and not contagem else "")
+                   + (" pegadinha" if pegadinha else ""))
         nb_info.blocos.append(
             f'<div class="{classes}"><div class="cab">'
             f'<button class="dobrar" aria-expanded="true">código</button>'
@@ -277,7 +281,8 @@ th, td { text-align: left; padding: .4rem .8rem .4rem 0; border-bottom: 1px soli
 .pegadinha.celula, section.pegadinha { border-left: 3px solid var(--tomate); padding-left: .8rem; margin-left: -.95rem; }
 .cab { display: flex; align-items: center; gap: .5rem; margin-bottom: .25rem; }
 .cab .exec { font-family: var(--mono); font-size: .75rem; color: var(--tinta-suave); flex: 1; }
-.celula.api .cab .exec { color: var(--tomate); }
+.celula.api .cab .exec { color: var(--manjericao); }
+.celula.api.nao-executada .cab .exec { color: var(--tomate); }
 .cab button { font-size: .72rem; padding: .1rem .5rem; }
 pre { margin: 0; overflow-x: auto; font: 13px/1.45 var(--mono); }
 pre.codigo { background: var(--codigo-fundo); border: 1px solid var(--linha); border-radius: 6px; padding: .8rem 1rem; }

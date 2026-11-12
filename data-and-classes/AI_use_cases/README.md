@@ -65,6 +65,14 @@ O `.env` **não vai para o git** (está no `.gitignore`). O `load_dotenv()` proc
 | [`03_avancado/contrato.py`](03_avancado/contrato.py) | o mesmo + `Ferramenta` (04) e `Intencao` (06) |
 | [`03_avancado/llm_simulado.py`](03_avancado/llm_simulado.py) | cliente simulado no formato da OpenAI |
 | [`03_avancado/mercado.py`](03_avancado/mercado.py) | peças de 07–09 reunidas para o pipeline do 10 |
+| [`saida.py`](saida.py) | saída formatada: `mostrar` (o `print` com cores), JSON, prompts em painel e tabelas via `rich`; eventos de execução via `logger_general` |
+| [`logger_general.py`](logger_general.py) | logger portátil (só biblioteca padrão): `GeneralLogger`, `JsonlWriter`, `view_file` |
+
+## Saída colorida
+
+Cada notebook começa importando o [`saida.py`](saida.py). Resultados saem pelo `rich`, com cores no padrão `rótulo: valor`, JSON destacado, prompts em painel com quebra de linha e tabelas. Eventos de execução (rodadas de ferramenta, tentativas, negações de política, etapas do pipeline) saem pelo `GeneralLogger` do [`logger_general.py`](logger_general.py), com horário e nível: `INFO` em verde, `WARNING` em amarelo.
+
+As cores são códigos ANSI na saída: aparecem no Jupyter, no VS Code e no terminal. `NO_COLOR=1` desliga. O import usa `sys.path.insert(0, str(Path.cwd().parent))`, ou seja, supõe o notebook rodando na própria pasta, que é o padrão do Jupyter e do VS Code.
 
 ## Pydantic × dataclass × enum, nesta trilha
 

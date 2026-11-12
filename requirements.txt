@@ -11,3 +11,4 @@ jupyterlab>=4
 nbconvert>=7
 sqlalchemy>=2.0      # enum/03: persistência de Enum via ORM
 mypy>=1.10           # opcional: dataclass_factory/05 (checagem estática do código gerado)
+rich

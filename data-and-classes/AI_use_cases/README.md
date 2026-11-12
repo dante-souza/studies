@@ -21,6 +21,11 @@ cada notebook termina mostrando **o que ainda quebra**: é esse problema que o p
   10 pipeline completo        → settings do ambiente, cache, log sem dados sensíveis, testes
 ```
 
+## Apresentação
+
+Básico e intermediário em slides: [`apresentacao/basico_e_intermediario.html`](apresentacao/basico_e_intermediario.html)
+(interativo, abre direto no navegador) e [`apresentacao/basico_e_intermediario.md`](apresentacao/basico_e_intermediario.md).
+
 ## Os ganchos
 
 | De | O que quebrou | Para | Como resolve |

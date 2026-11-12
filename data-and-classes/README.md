@@ -9,8 +9,7 @@ junta as três ferramentas em torno de **configuração dirigida por arquivos e 
 
 ```
 data-and-classes/
-├── README.md                     ← você está aqui
-├── requirements.txt
+├── README.md                     ← você está aqui    (dependências: requirements.txt na raiz do repositório)
 ├── pydantic/
 │   ├── pydantic.md               teoria: fronteira de confiança, pydantic-core, lax/strict, settings, DTOs de API
 │   ├── 01_pydantic_basico.ipynb
@@ -96,15 +95,15 @@ Cada nível da trilha de LLM pede só o que o nível correspondente dos módulos
 ## Como rodar
 
 ```bash
+python -m venv .venv && source .venv/bin/activate     # na raiz do repositório; ou conda/uv
+pip install -r requirements.txt                       # o requirements.txt fica na raiz
 cd data-and-classes
-python -m venv .venv && source .venv/bin/activate     # ou conda/uv
-pip install -r requirements.txt
 jupyter lab
 ```
 
 Requer **Python ≥ 3.12** (usa sintaxe de genéricos PEP 695 no dataclass avançado e em `AI_use_cases/casos_originais/01`;
 o resto roda em 3.11).
-Testado com Python 3.13, Pydantic 2.13, pydantic-settings 2.16, FastAPI 0.162, openai 3.49 e pydantic-ai 2.68.
+Testado com Python 3.13, Pydantic 2.13, pydantic-settings 2.16, FastAPI 0.162, openai 3.49, pydantic-ai 2.68 e rich 15.0.
 
 As células que chamam a API (trilha `AI_use_cases`, básico e intermediário) têm a tag `skip-execution`: o `nbconvert`
 as pula, então o laço acima roda sem `.env`.

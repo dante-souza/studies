@@ -79,7 +79,8 @@ Dois arquivos independentes, cada um copiável sozinho para outro projeto:
 
 - [`prettifier.py`](prettifier.py) **exibe** (depende de `rich`). Cada notebook troca o `print` por `show`, que mantém o padrão
   `rótulo: valor` com cores: rótulo em azul, erros em vermelho, números, strings e booleanos destacados, sem interpretar
-  marcação (`[texto]` sai como texto). Também: JSON destacado com tons por `status`, prompts em painel com quebra de linha,
+  marcação (`[texto]` sai como texto). Um JSON, sozinho ou no formato `rótulo: {json}`, sai com cores de chave e valor: numa
+  linha quando cabe, indentado quando não cabe (`show(texto, detect_json=False)` desliga). Também: JSON destacado com tons por `status`, prompts em painel com quebra de linha,
   tabelas e leitura de JSON, JSONL e logs com cor. `python prettifier.py selftest` testa o módulo.
 - [`logger_general.py`](logger_general.py) **registra** (só biblioteca padrão, cores ANSI próprias). Eventos de execução
   (rodadas de ferramenta, tentativas, negações de política, etapas do pipeline) saem com horário e nível: `INFO` em verde,

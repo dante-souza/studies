@@ -10,6 +10,9 @@ Conventions:
     * `show(...)` is a drop-in for print(): same arguments, colored output. In lines shaped
       like `label: value`, the label is highlighted; `SomethingError` / `SomethingException`
       are red; numbers, strings, None, booleans and reprs use rich's repr colors.
+    * JSON detection: `show(text)` with a JSON object/array string, or `label: <JSON>`, is shown
+      as JSON with key/value colors; on one line when it fits the width, indented otherwise.
+      `show(text, detect_json=False)` prints the string as-is.
     * rich markup is OFF: "[text]" is printed literally, never interpreted as a style tag.
     * Semantic coloring: JSON string values under keys such as "status" or "level" get a tone
       (good / bad / warn / info / muted), shown as a colored badge so it never blends with JSON
@@ -42,7 +45,7 @@ from rich.table import Table
 from rich.text import Text
 from rich.theme import Theme
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __all__ = [
     "Prettifier", "configure", "get_default", "show", "show_json", "show_panel", "show_table",
     "styled", "view_file", "rich_handler", "TONES", "run_selftest", "main",
@@ -87,6 +90,7 @@ DEFAULT_SEMANTIC_VALUES = {
 }
 
 _JSON_STRING = re.compile(r'"(?:\\.|[^"\\])*"(?P<colon>\s*:)?')
+_LABELED_JSON = re.compile(r"(?s)^(?P<label>[^\s{\[\"'#-][^\n:{}\[\]]{0,90}?): (?P<payload>[\[{].*)$")
 _LOG_LEVEL = re.compile(r"\b(?P<level>DEBUG|INFO|WARNING|ERROR|CRITICAL)\b")
 _LOG_TIME = re.compile(r"^\s*\[?\d{4}-\d\d-\d\d[ T]\d\d:\d\d:\d\d(?:[.,]\d+)?\]?|^\s*\[?\d\d:\d\d:\d\d\]?")
 
@@ -187,9 +191,40 @@ class Prettifier:
         )
 
     # ---------------------------------------------------------------- printing
-    def show(self, *objects: Any, sep: str = " ", end: str = "\n", **options: Any) -> None:
-        """print() with colors. Non-string objects (models, dicts, lists) are pretty-printed."""
+    def show(self, *objects: Any, sep: str = " ", end: str = "\n", detect_json: bool = True, **options: Any) -> None:
+        """print() with colors. Non-string objects (models, dicts, lists) are pretty-printed.
+
+        A single string that is a JSON object/array, or `label: <JSON object/array>`, is shown as JSON
+        (see module docstring). Pass detect_json=False to print it as plain text.
+        """
+        if detect_json and len(objects) == 1 and isinstance(objects[0], str) and not options:
+            rendered = self._json_from_text(objects[0])
+            if rendered is not None:
+                self.console.print(rendered, end=end)
+                return
         self.console.print(*objects, sep=sep, end=end, **options)
+
+    def _json_from_text(self, text: str) -> Any | None:
+        """Renderable for a JSON string or `label: JSON` string; None when the text is not that."""
+        stripped = text.strip()
+        label, payload = None, stripped
+        if stripped[:1] not in ("{", "["):
+            found = _LABELED_JSON.match(stripped)
+            if found is None:
+                return None
+            label, payload = found.group("label"), found.group("payload")
+        try:
+            data = json.loads(payload)
+        except json.JSONDecodeError:
+            return None
+        if not isinstance(data, (dict, list)) or not data:
+            return None
+        rules = _check_rules(None)
+        inline = self._json_text(data, indent=None, rules=rules, sort_keys=False)
+        if len(inline.plain) + (len(label) + 2 if label else 0) <= self.console.width:
+            return Text.assemble(Text(label, style="repr.label"), ": ", inline) if label else inline
+        body = self._json_text(data, indent=2, rules=rules, sort_keys=False)
+        return Group(Text.assemble(Text(label, style="repr.label"), ":"), body) if label else body
 
     @staticmethod
     def styled(text: Any, tone: str) -> Text:
@@ -374,6 +409,8 @@ def run_demo(*, color: str = "always") -> None:
     p.show("ratio: 0.25 | name: 'ação' | missing: None | enabled: True")
     p.show("ValueError: 'G' is not a valid Unit")
     p.show("[section] markup is printed literally")
+    p.show('order: {"id": 7, "items": [{"sku": "A-1", "qty": 2}, {"sku": "B-9", "qty": 1}], "status": "pending", '
+           '"note": "long JSON strings are indented when they do not fit the width"}')
     p.show_json({"id": 1, "status": "success", "detail": {"retry": False, "note": None}}, title="record")
     p.show_panel('Answer ONLY with JSON that follows this schema:\n{"type": "object", "properties": {"n": {"type": "integer"}}}',
                  title="prompt")
@@ -413,6 +450,21 @@ def run_selftest(*, color: str = "always") -> None:
             raise AssertionError("invalid tone accepted")
 
     plain, out = capture(False)
+    long_json = json.dumps([{"ingredient": f"item {i}", "amount": "250 grams"} for i in range(6)])
+    plain.show(long_json)                                                        # long: indented
+    assert out.getvalue().startswith('[\n  {\n    "ingredient": "item 0"'), out.getvalue()[:60]
+    out.seek(0), out.truncate()
+    plain.show(f"resposta: {long_json}")                                         # label + indented JSON
+    assert out.getvalue().startswith('resposta:\n[\n  {'), out.getvalue()[:40]
+    out.seek(0), out.truncate()
+    for kept in ('sizes: [1, 2, 3]', 'short: {"a":1}', "repr: {'a': 1}", "n: 5", "[x] not json"):
+        plain.show(kept)                                                          # fits or is not JSON: one line
+    assert out.getvalue().splitlines() == ["sizes: [1, 2, 3]", 'short: {"a": 1}', "repr: {'a': 1}", "n: 5",
+                                           "[x] not json"], out.getvalue()
+    out.seek(0), out.truncate()
+    plain.show(long_json, detect_json=False)
+    assert out.getvalue().startswith('[{"ingredient"'), out.getvalue()[:30]
+    out.seek(0), out.truncate()
     plain.show_panel("Use this schema:\n" + json.dumps({"a": [1, 2]}), title="prompt", compact=True)
     assert "Use this schema:" in out.getvalue() and '{"a": [1, 2]}' in out.getvalue()
     plain.show_json({"long": "y" * 250}, compact=True)
@@ -435,7 +487,7 @@ def run_selftest(*, color: str = "always") -> None:
     logger.addHandler(colored.rich_handler())
     logger.warning("handler works")
     assert "handler works" in out.getvalue() and "WARNING" in out.getvalue()
-    Prettifier(color=color).show("ok selftest passed: markup off, semantic tones, panels, tables, files, handler")
+    Prettifier(color=color).show("ok selftest passed: markup off, JSON detection, semantic tones, panels, tables, files, handler")
 
 
 def main(argv: list[str] | None = None) -> int:

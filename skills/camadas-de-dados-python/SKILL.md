@@ -7,6 +7,7 @@ description: Projetar, implementar ou revisar camadas de dados em Python com Enu
 
 Guia de projeto, implementação e revisão. Base: estudo `dante-souza/studies`, pasta `data-and-classes/` (módulos
 `enum/`, `dataclass/`, `pydantic/`, `dataclass_factory/` e a trilha `AI_use_cases/`, todos com notebooks executados).
+Versão em inglês da mesma skill: `skills/data-layers-python/` (nomes, mensagens e comentários traduzidos).
 
 **Marcas de confiança nas pegadinhas:** **(V)** verificada no estudo, com código executado; **(R)** observada em resposta
 real de LLM; sem marca = comportamento conhecido da biblioteca, não testado no estudo.

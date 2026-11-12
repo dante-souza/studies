@@ -2,7 +2,9 @@
 pydantic[email]>=2.11,<3
 pydantic-settings[yaml,toml]>=2.10
 pyyaml>=6
-python-dotenv>=1.0   # dataclass_factory/01 (.env)
+python-dotenv>=1.0   # dataclass_factory/01 e AI_use_cases (.env)
+openai>=1.99         # AI_use_cases (testado com 3.49)
+pydantic-ai-slim[openai]>=1.0   # AI_use_cases/01_basico/02 (testado com 2.68)
 fastapi>=0.115
 httpx>=0.27          # TestClient do FastAPI
 jupyterlab>=4

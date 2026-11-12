@@ -38,14 +38,14 @@ data-and-classes/
 │   ├── configs/                  arquivos de exemplo usados pelos notebooks
 │   ├── validadores.py            funções referenciadas por nome nas especificações
 │   └── generated/                código gerado pelo notebook 05
-└── AI_use_cases/
-    ├── README.md                 mapa dos casos e divisão de responsabilidades
-    ├── fake_llm.py               LLM simulado (roda offline, determinístico)
-    ├── 01_pydantic_structured_output.ipynb
-    ├── 02_pydantic_tool_calling.ipynb
-    ├── 03_enum_routing_and_guardrails.ipynb
-    ├── 04_dataclass_agent_runtime.ipynb
-    └── 05_agent_pipeline_end_to_end.ipynb
+└── AI_use_cases/                 trilha com LLM, um assistente de lista de compras do começo ao fim
+    ├── README.md                 mapa da trilha, como configurar o .env, ganchos entre níveis
+    ├── .env.example              modelo do .env (chave e endpoint)
+    ├── 01_basico/                API real: chamada e JSON, saída estruturada, enums e guardrails
+    ├── 02_intermediario/         API real + funções simples: ferramentas, regras e retry, roteamento por enum
+    ├── 03_avancado/              modelo simulado (formato OpenAI): contexto, permissões, runtime, pipeline testável
+    ├── respostas_gravadas/       respostas reais da API usadas nos notebooks
+    └── casos_originais/          versão anterior dos casos de LLM (mais densa, sem progressão)
 ```
 
 ## Ordem sugerida
@@ -55,12 +55,15 @@ flowchart LR
     E1[enum 01] --> D1[dataclass 01] --> P1[pydantic 01]
     P1 --> E2[enum 02] --> D2[dataclass 02] --> P2[pydantic 02]
     P2 --> E3[enum 03] --> D3[dataclass 03] --> P3[pydantic 03]
-    P3 --> AI[AI_use_cases 01→05]
+    P1 --> AIB[AI básico 01→03]
+    P2 --> AII[AI intermediário 04→06]
+    P3 --> AIA[AI avançado 07→10]
     P3 --> DF[dataclass_factory 01→06]
 ```
 
 Começar pelo Enum (o mais simples) e terminar no Pydantic (o mais completo) em cada nível faz cada notebook reaproveitar
 o anterior: o Pydantic intermediário usa Enum, o dataclass avançado faz a ponte com Pydantic, e os casos de LLM usam tudo.
+Cada nível da trilha de LLM pede só o que o nível correspondente dos módulos já cobriu.
 
 ## As três em uma tabela
 
@@ -99,13 +102,17 @@ pip install -r requirements.txt
 jupyter lab
 ```
 
-Requer **Python ≥ 3.12** (usa sintaxe de genéricos PEP 695 no dataclass avançado e no AI_use_cases 01; o resto roda em 3.11).
-Testado com Python 3.13, Pydantic 2.13, pydantic-settings 2.16 e FastAPI 0.162.
+Requer **Python ≥ 3.12** (usa sintaxe de genéricos PEP 695 no dataclass avançado e em `AI_use_cases/casos_originais/01`;
+o resto roda em 3.11).
+Testado com Python 3.13, Pydantic 2.13, pydantic-settings 2.16, FastAPI 0.162, openai 3.49 e pydantic-ai 2.68.
+
+As células que chamam a API (trilha `AI_use_cases`, básico e intermediário) têm a tag `skip-execution`: o `nbconvert`
+as pula, então o laço acima roda sem `.env`.
 
 Para reexecutar tudo de uma vez (verificação):
 
 ```bash
-for nb in */*.ipynb; do jupyter nbconvert --to notebook --execute --inplace "$nb" || echo "FALHOU: $nb"; done
+for nb in */*.ipynb */*/*.ipynb; do jupyter nbconvert --to notebook --execute --inplace "$nb" || echo "FALHOU: $nb"; done
 ```
 
 ## Notas sobre o material de partida

@@ -39,6 +39,7 @@ data-and-classes/
 │   └── generated/                código gerado pelo notebook 05
 └── AI_use_cases/                 trilha com LLM, um assistente de lista de compras do começo ao fim
     ├── README.md                 mapa da trilha, como configurar o .env, ganchos entre níveis
+    ├── trilha.html               os 10 notebooks executados num HTML dinâmico único (cores preservadas)
     ├── .env.example              modelo do .env (chave e endpoint)
     ├── 01_basico/                API real: chamada e JSON, saída estruturada, enums e guardrails
     ├── 02_intermediario/         API real + funções simples: ferramentas, regras e retry, roteamento por enum

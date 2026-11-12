@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM com contrato — básico e intermediário</title>
+<style>
+:root {
+  --papel: #F1F4EF;
+  --papel-fundo: #E3E8E1;
+  --tinta: #1E2A32;
+  --tinta-suave: #52606A;
+  --manjericao: #2E7A4E;
+  --tomate: #C23B2A;
+  --termica: #4A4D68;
+  --cupom: #FCFCFA;
+  --linha: #C9D1C6;
+  --codigo: #E6ECE4;
+  --titulo: "Bahnschrift Condensed", "Bahnschrift", "Avenir Next Condensed", "Roboto Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --texto: "Seravek", "Gill Sans Nova", "Segoe UI", "Ubuntu", "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Menlo", "Consolas", "DejaVu Sans Mono", monospace;
+  --largura-cupom: 290px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--texto);
+  font-size: clamp(15px, 1.15vw + 6px, 19px);
+  line-height: 1.5;
+  overflow: hidden;
+}
+:focus-visible { outline: 3px solid var(--manjericao); outline-offset: 2px; }
+
+/* ---------- palco ---------- */
+.palco {
+  position: fixed; inset: 0 var(--largura-cupom) 3rem 0;
+  overflow: hidden;
+}
+.slide {
+  position: absolute; inset: 0;
+  padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1.25rem, 5vw, 4.5rem) 2rem;
+  overflow-y: auto;
+  visibility: hidden; opacity: 0;
+  transition: opacity .25s ease;
+}
+.slide.atual { visibility: visible; opacity: 1; }
+.slide > * { max-width: 62rem; }
+.onde {
+  font-family: var(--mono); font-size: .8rem; color: var(--tinta-suave);
+  margin: 0 0 .6rem;
+}
+h1, h2 {
+  font-family: var(--titulo); font-stretch: condensed; font-weight: 700;
+  letter-spacing: -.01em; line-height: 1.02; margin: 0 0 1.1rem;
+}
+h1 { font-size: clamp(2.6rem, 6vw, 5.2rem); max-width: 14ch; }
+h2 { font-size: clamp(1.9rem, 3.6vw, 3.1rem); max-width: 26ch; }
+h3 { font-family: var(--titulo); font-stretch: condensed; font-size: 1.35rem; margin: 1.4rem 0 .4rem; }
+p, li { max-width: 68ch; }
+p { margin: 0 0 .9rem; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+.subtitulo { font-size: 1.25rem; color: var(--tinta-suave); max-width: 48ch; }
+.gancho {
+  margin-top: 1.4rem; padding-left: .9rem;
+  border-left: 4px solid var(--tomate);
+  font-weight: 600;
+}
+.gancho.ok { border-left-color: var(--manjericao); }
+kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--tinta-suave); border-bottom-width: 2px; border-radius: 3px; padding: 0 .3em; background: #fff; }
+.marca { font-family: var(--mono); font-size: .72rem; padding: .05rem .4rem; border-radius: 3px; vertical-align: .12em; }
+.marca.real { background: var(--manjericao); color: #fff; }
+.marca.construido { background: var(--termica); color: #fff; }
+
+/* ---------- código ---------- */
+code { font-family: var(--mono); font-size: .88em; background: var(--codigo); padding: .05em .3em; border-radius: 3px; }
+pre {
+  font-family: var(--mono); font-size: clamp(12px, .78vw + 5px, 15px); line-height: 1.5;
+  background: var(--codigo); padding: .9rem 1.1rem; border-radius: 4px;
+  overflow-x: auto; margin: 0 0 1rem; max-width: 62rem;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+pre.saida { background: transparent; border: 1px solid var(--linha); color: var(--termica); }
+.k { color: #7A3E9D; font-weight: 600; } .s { color: #2E7A4E; } .c { color: #7C8790; font-style: italic; }
+.n { color: #B25B12; } .d { color: #2A6A9A; } .b { color: #2A6A9A; }
+
+/* ---------- tabelas ---------- */
+table { border-collapse: collapse; margin: 0 0 1rem; max-width: 62rem; width: 100%; font-size: .92rem; }
+th, td { text-align: left; padding: .45rem .7rem .45rem 0; border-bottom: 1px solid var(--linha); vertical-align: top; }
+th { font-family: var(--titulo); font-stretch: condensed; font-size: 1rem; color: var(--tinta-suave); font-weight: 600; }
+td code { white-space: nowrap; }
+
+.duas { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 62rem; }
+.duas > * { min-width: 0; }
+
+/* ---------- bancada (demos) ---------- */
+.bancada {
+  border: 2px dashed var(--linha); border-radius: 6px;
+  padding: .9rem 1rem 1rem; margin: 1rem 0; max-width: 62rem;
+}
+.bancada > .rotulo { font-family: var(--titulo); font-stretch: condensed; font-weight: 700; font-size: 1.05rem; margin: 0 0 .1rem; }
+.bancada > .nota { font-size: .8rem; color: var(--tinta-suave); margin: 0 0 .7rem; }
+.controles { display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: end; margin-bottom: .7rem; }
+.controles label { display: flex; flex-direction: column; font-size: .8rem; color: var(--tinta-suave); gap: .2rem; }
+.controles label.inline { flex-direction: row; align-items: center; gap: .4rem; color: var(--tinta); font-size: .9rem; }
+input, select, textarea, button { font: inherit; font-size: .92rem; color: var(--tinta); }
+input[type=text], input[type=number], select, textarea {
+  background: #fff; border: 1px solid var(--linha); border-radius: 4px; padding: .35rem .5rem; font-family: var(--mono);
+}
+textarea { width: 100%; min-height: 3.2rem; resize: vertical; }
+input[type=range] { accent-color: var(--manjericao); width: 12rem; }
+button {
+  background: var(--tinta); color: var(--papel); border: 0; border-radius: 4px;
+  padding: .45rem .9rem; cursor: pointer; font-weight: 600;
+}
+button.secundario { background: transparent; color: var(--tinta); border: 1px solid var(--tinta); }
+button:disabled { opacity: .4; cursor: default; }
+.resultado {
+  font-family: var(--mono); font-size: .88rem; white-space: pre-wrap; word-break: break-word;
+  padding: .6rem .8rem; border-radius: 4px; background: #fff; border-left: 4px solid var(--linha); min-height: 2.4rem;
+}
+.resultado.bom { border-left-color: var(--manjericao); }
+.resultado.ruim { border-left-color: var(--tomate); }
+.linhas-ing { display: grid; grid-template-columns: minmax(8rem, 14rem) 6rem 5rem; gap: .4rem; margin-bottom: .7rem; }
+.barras { display: grid; gap: .35rem; margin: .6rem 0; }
+.barra-env { display: grid; grid-template-columns: 6.5rem 1fr 4rem; align-items: center; gap: .6rem; font-family: var(--mono); font-size: .8rem; }
+.barra-env span.trilho { height: .8rem; background: var(--codigo); border-radius: 2px; overflow: hidden; }
+.barra-env span.trilho i { display: block; height: 100%; background: var(--termica); }
+
+/* ---------- cupom ---------- */
+.cupom {
+  position: fixed; top: 0; right: 0; bottom: 0; width: var(--largura-cupom);
+  background: var(--papel-fundo); padding: 1.2rem 1rem 3.5rem;
+  display: flex; flex-direction: column; z-index: 2;
+}
+.fita {
+  background: var(--cupom); color: var(--termica);
+  font-family: var(--mono); font-size: 12.5px; line-height: 1.45;
+  padding: 1rem .9rem 1.2rem; flex: 1; overflow-y: auto;
+  box-shadow: 0 1px 0 var(--linha);
+  -webkit-mask: linear-gradient(#000 0 0) top/100% calc(100% - 8px) no-repeat,
+                conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom/12px 8px repeat-x;
+          mask: linear-gradient(#000 0 0) top/100% calc(100% - 8px) no-repeat,
+                conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom/12px 8px repeat-x;
+}
+.fita .cab { text-align: center; margin-bottom: .6rem; }
+.fita .cab b { display: block; font-size: 14px; color: var(--tinta); }
+.fita hr { border: 0; border-top: 1px dashed var(--termica); margin: .55rem 0; opacity: .6; }
+.item { margin: .45rem 0; }
+.item .nb { color: var(--tinta); font-weight: 700; }
+.item .ganho { color: var(--manjericao); }
+.item .quebra { color: var(--tomate); }
+.item .quebra.resolvida { color: var(--tinta-suave); text-decoration: line-through; text-decoration-thickness: 1.5px; }
+.item .quebra small { text-decoration: none; display: inline-block; margin-left: .3rem; color: var(--termica); }
+.item.imprimindo { animation: imprime .55s steps(6, end); }
+@keyframes imprime { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+.totais { display: flex; justify-content: space-between; }
+.vazio { color: var(--tinta-suave); font-style: italic; }
+
+/* ---------- barra inferior ---------- */
+.navegacao {
+  position: fixed; left: 0; right: var(--largura-cupom); bottom: 0; height: 3rem;
+  display: flex; align-items: center; gap: .6rem; padding: 0 1.2rem;
+  border-top: 1px solid var(--linha); background: var(--papel); z-index: 3;
+}
+.navegacao .progresso { flex: 1; height: 3px; background: var(--linha); border-radius: 2px; overflow: hidden; }
+.navegacao .progresso i { display: block; height: 100%; background: var(--tinta); width: 0; transition: width .25s; }
+.navegacao .contador { font-family: var(--mono); font-size: .8rem; min-width: 4.5rem; text-align: right; }
+.navegacao button { padding: .3rem .7rem; font-size: .85rem; }
+.dica { font-size: .75rem; color: var(--tinta-suave); }
+
+/* ---------- visão geral ---------- */
+.visao {
+  position: fixed; inset: 0; background: var(--papel); z-index: 10; overflow-y: auto;
+  padding: 2rem; display: none;
+}
+.visao.aberta { display: block; }
+.visao h2 { margin-bottom: 1rem; }
+.visao ol { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: .5rem; max-width: none; }
+.visao li { max-width: none; margin: 0; }
+.visao button {
+  width: 100%; text-align: left; background: transparent; color: var(--tinta);
+  border: 1px solid var(--linha); padding: .6rem .7rem; font-weight: 400; display: flex; gap: .6rem;
+}
+.visao button span { font-family: var(--mono); font-size: .8rem; color: var(--tinta-suave); padding-top: .1rem; }
+.visao button[aria-current=true] { border-color: var(--tinta); border-width: 2px; }
+
+/* ---------- capa ---------- */
+.capa h1 { margin-top: 8vh; }
+.capa .fluxo { font-family: var(--mono); font-size: .9rem; color: var(--termica); margin-top: 2.5rem; line-height: 1.9; }
+
+/* ---------- responsivo ---------- */
+@media (max-width: 1100px) {
+  :root { --largura-cupom: 0px; }
+  .cupom { width: min(320px, 85vw); transform: translateX(100%); transition: transform .25s; box-shadow: -8px 0 24px rgba(30,42,50,.18); }
+  body.cupom-aberto .cupom { transform: none; }
+  .duas { grid-template-columns: 1fr; }
+}
+@media (min-width: 1101px) { #alternar-cupom { display: none; } }
+@media (max-width: 640px) { .dica { display: none; } .linhas-ing { grid-template-columns: 1fr 4.5rem 4.5rem; } }
+@media (prefers-reduced-motion: reduce) {
+  .slide, .navegacao .progresso i, .cupom { transition: none; }
+  .item.imprimindo { animation: none; }
+}
+@media print {
+  body { overflow: visible; }
+  .palco { position: static; }
+  .slide { position: static; visibility: visible; opacity: 1; page-break-after: always; overflow: visible; }
+  .cupom, .navegacao, .bancada { display: none; }
+}
+</style>
+</head>
+<body>
+
+<main class="palco" id="palco" aria-live="polite">
+
+<!-- 1 -->
+<section class="slide capa" data-nb="0" data-titulo="LLM com contrato">
+  <p class="onde">trilha AI_use_cases, básico e intermediário</p>
+  <h1>LLM com contrato</h1>
+  <p class="subtitulo">Do JSON solto ao roteamento por enum, em seis notebooks e um assistente de lista de compras.</p>
+  <p class="fluxo">01 chamada e JSON &nbsp;▸&nbsp; 02 saída estruturada &nbsp;▸&nbsp; 03 enums e guardrails<br>
+     04 ferramentas &nbsp;▸&nbsp; 05 regras e retry &nbsp;▸&nbsp; 06 roteamento por enum</p>
+  <p class="dica" style="margin-top:2rem">Setas ou espaço para navegar. <kbd>o</kbd> abre a visão geral. O cupom ao lado registra o que cada notebook garantiu e o que ficou quebrado.</p>
+</section>
+
+<!-- 2 -->
+<section class="slide" data-nb="0" data-titulo="O caso">
+  <h2>O usuário diz o prato, o modelo devolve os ingredientes</h2>
+  <p>Simples de propósito: tudo que dá errado aqui dá errado em qualquer aplicação com LLM.</p>
+  <pre class="saida"><code>  usuário ──► "pizza margherita para 2"
+                      │
+                      ▼
+               ┌─────────────┐        o que pode dar errado
+               │     LLM     │ ──►    • formato: JSON quebrado, texto em volta
+               └─────────────┘        • tipos: "250 grams" como texto
+                      │               • vocabulário: "cups" em vez de "g"
+                      ▼               • bom senso: 3 kg de sal
+               lista de compras       • escopo: "qual a capital da França?"</code></pre>
+  <h3>Sobre os exemplos</h3>
+  <p><span class="marca real">real</span> veio da API ou da execução dos notebooks. <span class="marca construido">construído</span> é uma resposta escrita à mão no formato que o modelo devolveria, para demonstrar um caso.</p>
+</section>
+
+<!-- 3 -->
+<section class="slide" data-nb="0" data-titulo="A trilha">
+  <h2>Cada notebook fecha uma brecha do anterior</h2>
+  <table>
+    <thead><tr><th>Notebook</th><th>Garante</th><th>O que ainda quebra</th></tr></thead>
+    <tbody>
+      <tr><td>01 chamada e JSON</td><td>conversa com a API</td><td>quantidade vem como texto</td></tr>
+      <tr><td>02 saída estruturada</td><td>campos e tipos</td><td>unidade aceita qualquer texto</td></tr>
+      <tr><td>03 enums e guardrails</td><td>vocabulário fechado, escopo</td><td>valores absurdos; modelo não sabe preços</td></tr>
+      <tr><td>04 ferramentas</td><td>dados reais, execução segura</td><td>ninguém confere a lista final</td></tr>
+      <tr><td>05 regras e retry</td><td>regras de negócio, feedback</td><td>regras fora do contrato</td></tr>
+      <tr><td>06 roteamento</td><td>intenção vira rota</td><td>permissões, enum aberto</td></tr>
+    </tbody>
+  </table>
+  <p>Básico (01–03): API real, código direto. Intermediário (04–06): API real e funções simples.</p>
+</section>
+
+<!-- 4 -->
+<section class="slide" data-nb="1" data-titulo="01 chamada e JSON">
+  <p class="onde">notebook 01</p>
+  <h2>A primeira chamada, no molde do .env</h2>
+  <div class="duas">
+    <div>
+<pre><code class="py">load_dotenv()
+api_key = os.getenv("openai")
+openai_base_url = os.getenv("openai_base_url")
+ai_client = OpenAI(api_key=api_key, base_url=openai_base_url)</code></pre>
+      <p>O formato vai no prompt, como pedido:</p>
+<pre><code>Answer in JSON format: [{"ingredients": "...", "amount": "..."}]</code></pre>
+    </div>
+    <div>
+      <p><span class="marca real">real</span> gpt-4o-mini, resposta gravada: 484 caracteres, 9 itens.</p>
+<pre class="saida"><code>All-purpose flour: 250 grams
+Active dry yeast: 5 grams
+Salt: 5 grams
+type(primeiro['amount']).__name__: str</code></pre>
+      <p>Funciona. Mas a quantidade é <strong>texto</strong>, e nada garante o formato da próxima resposta.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="slide" data-nb="1" data-titulo="01 o que quebra">
+  <p class="onde">notebook 01</p>
+  <h2>O pior erro é o que não dá erro</h2>
+  <table>
+    <thead><tr><th>Situação</th><th>Resultado</th></tr></thead>
+    <tbody>
+      <tr><td>dobrar a receita com a resposta <span class="marca real">real</span></td><td><code>'250 grams250 grams'</code></td></tr>
+      <tr><td>texto antes do JSON <span class="marca construido">construído</span></td><td><code>JSONDecodeError: Expecting value: line 1 column 1 (char 0)</code></td></tr>
+      <tr><td>chave com outro nome <span class="marca construido">construído</span></td><td><code>KeyError: 'ingredients'</code></td></tr>
+    </tbody>
+  </table>
+  <div class="bancada" id="demo-dobro">
+    <p class="rotulo">Dobre a receita</p>
+    <p class="nota">Reproduz o que o Python faz com <code>quantidade * 2</code>. Experimente <code>250 grams</code> e depois <code>250</code>.</p>
+    <div class="controles">
+      <label>valor de amount <input type="text" id="dobro-valor" value="250 grams"></label>
+      <label class="inline"><input type="checkbox" id="dobro-texto" checked> veio como texto (entre aspas no JSON)</label>
+    </div>
+    <div class="resultado" id="dobro-saida"></div>
+  </div>
+  <p class="gancho">Falta um contrato: quais campos existem e de que tipo.</p>
+</section>
+
+<!-- 6 -->
+<section class="slide" data-nb="2" data-titulo="02 o contrato">
+  <p class="onde">notebook 02</p>
+  <h2>Uma classe diz o formato e confere a resposta</h2>
+<pre><code class="py">class Ingrediente(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    nome: str
+    quantidade: float = Field(gt=0, description="Quantidade numérica, sem unidade")
+    unidade: str = Field(description="Unidade métrica: g, kg, ml, l ou un")
+
+
+class ListaDeCompras(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    prato: str
+    porcoes: int = Field(gt=0)
+    ingredientes: list[Ingrediente]</code></pre>
+  <p>A mesma classe gera o JSON Schema que vai para o modelo e valida o que volta:</p>
+<pre class="saida"><code>quantidade: {'description': 'Quantidade numérica, sem unidade', 'exclusiveMinimum': 0, 'title': 'Quantidade', 'type': 'number'}</code></pre>
+</section>
+
+<!-- 7 -->
+<section class="slide" data-nb="2" data-titulo="02 três jeitos">
+  <p class="onde">notebook 02</p>
+  <h2>Três jeitos de pedir a resposta no formato do contrato</h2>
+  <table>
+    <thead><tr><th>Jeito</th><th>Como</th><th>Funciona em</th></tr></thead>
+    <tbody>
+      <tr><td>schema no prompt</td><td><code>prompt_com_schema(...)</code> e <code>model_validate_json</code></td><td>qualquer endpoint compatível</td></tr>
+      <tr><td>saída estruturada nativa</td><td><code>.parse(response_format=ListaDeCompras)</code></td><td>endpoints que suportam</td></tr>
+      <tr><td>pydantic-ai</td><td><code>Agent(modelo, output_type=ListaDeCompras)</code></td><td>como o primeiro, com menos código</td></tr>
+    </tbody>
+  </table>
+  <h3>Pegadinha testada no Jupyter</h3>
+<pre class="saida"><code>agente.run_sync(...)  ->  RuntimeError: This event loop is already running</code></pre>
+  <p>O kernel já tem um event loop rodando. No notebook, use <code>await agente.run(...)</code>. Em script <code>.py</code>, <code>run_sync</code> funciona.</p>
+</section>
+
+<!-- 8 -->
+<section class="slide" data-nb="2" data-titulo="02 o contrato trabalhando">
+  <p class="onde">notebook 02</p>
+  <h2>A resposta antiga é recusada, a nova pode ser dobrada</h2>
+  <div class="duas">
+    <div>
+      <p><span class="marca real">real</span> a resposta do 01 é uma lista solta, não um objeto:</p>
+<pre class="saida"><code>primeiro: Input should be an object
+('nome',): Field required
+('quantidade',): Field required
+('unidade',): Field required
+('ingredients',): Extra inputs are not permitted
+('amount',): Extra inputs are not permitted</code></pre>
+    </div>
+    <div>
+      <p><span class="marca construido">construído</span> no formato novo, para 4 porções:</p>
+<pre class="saida"><code>farinha de trigo: 500 g
+fermento biológico seco: 10 g
+água: 300 ml</code></pre>
+      <p>A mensagem de erro diz exatamente o que falta. É ela que, mais adiante, volta para o modelo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slide" data-nb="2" data-titulo="02 o que quebra">
+  <p class="onde">notebook 02</p>
+  <h2>O contrato garante a forma, não o vocabulário</h2>
+  <ol>
+    <li><strong><code>description</code> é pedido, não regra.</strong> Com <code>unidade: str</code>, passa <code>['cups', 'tablespoon']</code> <span class="marca construido">construído</span>.</li>
+    <li><strong>Texto em volta do JSON</strong> ainda quebra o caminho do schema no prompt (<code>json_invalid</code>). Um <code>extrair_json</code> que pega da primeira <code>{</code> à última <code>}</code> resolve a maioria dos casos.</li>
+  </ol>
+  <p class="gancho">Falta fechar o vocabulário de cada campo.</p>
+</section>
+
+<!-- 10 -->
+<section class="slide" data-nb="3" data-titulo="03 enums">
+  <p class="onde">notebook 03</p>
+  <h2>Enum: o vocabulário vira uma lista fechada</h2>
+  <div class="duas">
+<pre><code class="py">class Unidade(StrEnum):
+    G = "g"
+    KG = "kg"
+    ML = "ml"
+    L = "l"
+    UN = "un"</code></pre>
+<pre class="saida"><code>Unidade no schema: {'enum': ['g', 'kg', 'ml', 'l', 'un'], ...}
+[hortifruti] manjericão fresco (1 un), tomate italiano (4 un)
+[laticinios] muçarela de búfala (150 g)
+[mercearia] farinha de trigo (250 g), azeite (15 ml)</code></pre>
+  </div>
+  <div class="bancada" id="demo-unidade">
+    <p class="rotulo">Valide uma unidade</p>
+    <p class="nota">Mesma regra e mesma mensagem do Pydantic no notebook. Teste <code>cups</code>, <code>G</code>, <code> g</code> e <code>gramas</code>.</p>
+    <div class="controles">
+      <label>unidade <input type="text" id="unidade-valor" value="cups"></label>
+      <label class="inline"><input type="checkbox" id="unidade-normalizar"> normalizar caixa e espaços (BeforeValidator)</label>
+    </div>
+    <div class="resultado" id="unidade-saida"></div>
+  </div>
+</section>
+
+<!-- 11 -->
+<section class="slide" data-nb="3" data-titulo="03 guardrail de escopo">
+  <p class="onde">notebook 03</p>
+  <h2>O modelo declara o tipo do pedido; o código trata cada tipo</h2>
+<pre><code class="py">class TipoPedido(StrEnum):
+    RECEITA = "receita"
+    FORA_DO_ESCOPO = "fora_do_escopo"
+
+
+class RespostaAssistente(BaseModel):
+    tipo: TipoPedido
+    lista: ListaDeCompras | None = None
+    motivo: str | None = None
+
+    @model_validator(mode="after")
+    def tipo_combina_com_conteudo(self): ...  # receita exige lista; fora do escopo exige motivo</code></pre>
+  <div class="bancada" id="demo-escopo">
+    <p class="rotulo">Monte uma resposta do modelo</p>
+    <p class="nota">Validação e <code>tratar()</code> do notebook 03.</p>
+    <div class="controles">
+      <label>tipo <select id="escopo-tipo"><option>receita</option><option>fora_do_escopo</option><option>piada</option></select></label>
+      <label class="inline"><input type="checkbox" id="escopo-lista" checked> com lista</label>
+      <label class="inline"><input type="checkbox" id="escopo-motivo"> com motivo</label>
+    </div>
+    <div class="resultado" id="escopo-saida"></div>
+  </div>
+</section>
+
+<!-- 12 -->
+<section class="slide" data-nb="3" data-titulo="03 o que quebra">
+  <p class="onde">notebook 03</p>
+  <h2>Enum garante o vocabulário, não o bom senso</h2>
+  <table>
+    <thead><tr><th>Pegadinha</th><th>Demonstração</th><th>Saída</th></tr></thead>
+    <tbody>
+      <tr><td>enum compara texto exato</td><td><code>Unidade("G")</code></td><td><code>'G' is not a valid Unidade</code></td></tr>
+      <tr><td><code>match</code> sem <code>case _</code></td><td>o enum ganha <code>SUBSTITUICAO</code></td><td><code>rotular(SUBSTITUICAO): None</code>, sem erro</td></tr>
+      <tr><td>bom senso fica de fora</td><td>3 kg de sal, 40 muçarelas, farinha em laticínios <span class="marca construido">construído</span></td><td>tudo válido</td></tr>
+    </tbody>
+  </table>
+  <p class="gancho">Decidir se um valor faz sentido exige regras e dados que o modelo não tem. Isso é código.</p>
+</section>
+
+<!-- 13 -->
+<section class="slide" data-nb="3" data-titulo="Fechamento do básico">
+  <h2>Fechamento do básico</h2>
+  <table>
+    <thead><tr><th>Notebook</th><th>Garantiu</th><th>Ficou de fora</th></tr></thead>
+    <tbody>
+      <tr><td>01</td><td>chamar a API e ler JSON</td><td>formato e tipos</td></tr>
+      <tr><td>02</td><td>forma: campos e tipos, com Pydantic</td><td>vocabulário dos campos</td></tr>
+      <tr><td>03</td><td>vocabulário com enum, escopo com guardrail</td><td>bom senso dos valores, dados externos</td></tr>
+    </tbody>
+  </table>
+  <p>Daqui em diante o contrato do básico vive em <code>02_intermediario/contrato.py</code>, já com a normalização de caixa da pegadinha do 03.</p>
+</section>
+
+<!-- 14 -->
+<section class="slide" data-nb="4" data-titulo="04 ferramentas">
+  <p class="onde">notebook 04</p>
+  <h2>O modelo pede, o seu código executa</h2>
+  <p>O modelo não sabe o preço do tomate nem o que tem na despensa. Ferramentas são funções Python comuns que ele pode pedir.</p>
+<pre><code class="py">class Ferramenta(StrEnum):
+    CONSULTAR_PRECO = "consultar_preco"
+    VERIFICAR_DESPENSA = "verificar_despensa"
+
+
+FERRAMENTAS = {  # nome -> (modelo dos argumentos, função)
+    Ferramenta.CONSULTAR_PRECO: (ArgsIngrediente, consultar_preco),
+    Ferramenta.VERIFICAR_DESPENSA: (ArgsIngrediente, verificar_despensa),
+}
+TOOLS = [openai.pydantic_function_tool(args, name=f.value, description=DESCRICOES[f])
+         for f, (args, _) in FERRAMENTAS.items()]</code></pre>
+  <p>O enum é a lista fechada do que pode ser chamado. O modelo Pydantic dos argumentos vira o schema da ferramenta.</p>
+</section>
+
+<!-- 15 -->
+<section class="slide" data-nb="4" data-titulo="04 guardrail na execução">
+  <p class="onde">notebook 04</p>
+  <h2>Antes de executar: a ferramenta existe? Os argumentos batem?</h2>
+  <p>Erro não levanta exceção. Vira resultado da ferramenta e volta ao modelo, que pode corrigir na rodada seguinte.</p>
+  <div class="bancada" id="demo-ferramenta">
+    <p class="rotulo">Peça uma ferramenta como o modelo pediria</p>
+    <p class="nota"><code>executar_ferramenta</code> do notebook 04, com os mesmos preços e a mesma despensa. Detalhes do erro resumidos a tipo, campo e mensagem.</p>
+    <div class="controles">
+      <label>nome <select id="ferr-nome"><option>consultar_preco</option><option>verificar_despensa</option><option>apagar_arquivos</option><option>finalizar_compra</option></select></label>
+      <label style="flex:1;min-width:16rem">argumentos (JSON) <input type="text" id="ferr-args" value='{"nome": "azeite"}'></label>
+    </div>
+    <div class="controles">
+      <button class="secundario" data-args='{"nome": "azeite"}'>azeite</button>
+      <button class="secundario" data-args='{"nome": "farinha de trigo"}'>farinha</button>
+      <button class="secundario" data-args='{"nome": "trufa"}'>trufa</button>
+      <button class="secundario" data-args='{"ingrediente": "azeite"}'>chave errada</button>
+      <button class="secundario" data-args='{"nome": 42}'>tipo errado</button>
+    </div>
+    <div class="resultado" id="ferr-saida"></div>
+  </div>
+</section>
+
+<!-- 16 -->
+<section class="slide" data-nb="4" data-titulo="04 o laço">
+  <p class="onde">notebook 04</p>
+  <h2>Uma pergunta, várias rodadas</h2>
+<pre class="saida"><code>conversar()                         modelo                     executar_ferramenta()
+    │── system + pergunta ─────────►  │
+    │◄── tool_calls: preço, despensa ─│
+    │── nome + argumentos ─────────────────────────────────────────► │
+    │◄────────────────────────────────────── resultado ou erro JSON ─│
+    │── histórico + resultados ────►  │
+    │◄── resposta final em texto ─────│</code></pre>
+  <ul>
+    <li><code>chamar_modelo</code> entra como parâmetro: API real ou roteiro construído, o laço é o mesmo.</li>
+    <li><code>ConfiguracaoChamada</code> é uma dataclass congelada com <code>max_rodadas</code>. Um modelo que pede ferramentas para sempre termina em <code>RuntimeError: sem resposta final em 2 rodadas</code>.</li>
+  </ul>
+</section>
+
+<!-- 17 -->
+<section class="slide" data-nb="4" data-titulo="04 o que quebra">
+  <p class="onde">notebook 04</p>
+  <h2>Dados entram, mas ninguém confere a lista</h2>
+  <table>
+    <thead><tr><th>Pegadinha</th><th>Saída ou consequência</th></tr></thead>
+    <tbody>
+      <tr><td><code>float</code> não é dinheiro</td><td><code>0.10 + 0.20: 0.30000000000000004</code></td></tr>
+      <tr><td>a ferramenta sai com <code>"strict": true</code></td><td>endpoints compatíveis podem ignorar ou recusar; a validação local continua necessária</td></tr>
+      <tr><td>resultado de ferramenta volta para o prompt</td><td>dado de fonte externa é entrada não confiável</td></tr>
+    </tbody>
+  </table>
+  <p class="gancho">A lista final ainda pode ter 3 kg de sal.</p>
+</section>
+
+<!-- 18 -->
+<section class="slide" data-nb="5" data-titulo="05 regras">
+  <p class="onde">notebook 05</p>
+  <h2>Regras de negócio como funções que listam problemas</h2>
+<pre><code class="py">LIMITE_POR_PESSOA = {Unidade.G: 400, Unidade.KG: 0.4, Unidade.ML: 300, Unidade.L: 0.3, Unidade.UN: 4}
+REGRAS = [regra_quantidade_por_pessoa, regra_sem_duplicados]   # cada uma devolve list[str]</code></pre>
+  <div class="bancada" id="demo-regras">
+    <p class="rotulo">Confira uma lista</p>
+    <p class="nota"><code>validar_pedido</code> e <code>verificar_regras</code> do notebook 05. Porções fora de 1 a 20 param antes da chamada ao modelo.</p>
+    <div class="controles">
+      <label>porções <input type="number" id="regras-porcoes" value="2" style="width:5rem"></label>
+    </div>
+    <div class="linhas-ing" id="regras-linhas"></div>
+    <div class="resultado" id="regras-saida"></div>
+  </div>
+</section>
+
+<!-- 19 -->
+<section class="slide" data-nb="5" data-titulo="05 retry">
+  <p class="onde">notebook 05</p>
+  <h2>Quando a resposta quebra uma regra, o erro volta ao modelo</h2>
+  <div class="bancada" id="demo-retry">
+    <p class="rotulo">Acompanhe as tentativas</p>
+    <p class="nota">Roteiros construídos do notebook. Tamanhos reais medidos na execução.</p>
+    <div class="controles">
+      <label>roteiro <select id="retry-roteiro">
+        <option value="corrige">exagera e corrige</option>
+        <option value="sempre">erra sempre</option>
+      </select></label>
+      <button id="retry-passo">próxima tentativa</button>
+      <button class="secundario" id="retry-reiniciar">reiniciar</button>
+    </div>
+    <div class="barras" id="retry-barras"></div>
+    <div class="resultado" id="retry-saida"></div>
+  </div>
+  <p>Cada tentativa reenvia a conversa inteira. O retry custa caro, e é por isso que <code>validar_pedido</code> vem antes da primeira chamada.</p>
+</section>
+
+<!-- 20 -->
+<section class="slide" data-nb="5" data-titulo="05 o que quebra">
+  <p class="onde">notebook 05</p>
+  <h2>As regras ainda moram fora do contrato</h2>
+  <table>
+    <thead><tr><th>Pegadinha</th><th>Demonstração</th></tr></thead>
+    <tbody>
+      <tr><td>dá para esquecer de chamar as regras</td><td><code>ListaDeCompras.model_validate_json(...)</code> sozinho aceita 2 kg de farinha</td></tr>
+      <tr><td>regras sem contexto</td><td>o limite é fixo; orçamento, despensa e preços não entram</td></tr>
+      <tr><td>retry não conserta pedido ruim</td><td>problema determinístico só gasta tentativas</td></tr>
+    </tbody>
+  </table>
+  <p class="gancho">E até aqui todo pedido vira "gere uma lista". O usuário também pergunta preço e pede substituição.</p>
+</section>
+
+<!-- 21 -->
+<section class="slide" data-nb="6" data-titulo="06 roteamento">
+  <p class="onde">notebook 06</p>
+  <h2>O modelo classifica, uma tabela decide</h2>
+<pre><code class="py">ROTAS = {Intencao.RECEITA: responder_receita, Intencao.PRECO: responder_preco,
+         Intencao.SUBSTITUICAO: responder_substituicao, Intencao.FORA_DO_ESCOPO: recusar}
+assert not set(Intencao) - ROTAS.keys()     # teste de cobertura
+LIMIAR_CONFIANCA = 0.7                      # abaixo disso: revisão humana</code></pre>
+  <div class="bancada" id="demo-rota">
+    <p class="rotulo">Classifique um pedido</p>
+    <p class="nota"><code>rotear()</code> e <code>FERRAMENTAS_POR_ROTA</code> do notebook 06.</p>
+    <div class="controles">
+      <label>intenção <select id="rota-intencao">
+        <option>receita</option><option>preco</option><option>substituicao</option><option>fora_do_escopo</option><option>receita_doce</option>
+      </select></label>
+      <label>confiança <input type="range" id="rota-confianca" min="0" max="1" step="0.05" value="0.9"></label>
+      <span class="resultado" id="rota-valor" style="min-height:0;padding:.2rem .5rem">0.90</span>
+    </div>
+    <div class="resultado" id="rota-saida"></div>
+  </div>
+</section>
+
+<!-- 22 -->
+<section class="slide" data-nb="6" data-titulo="06 o que quebra">
+  <p class="onde">notebook 06</p>
+  <h2>A confiança é o modelo falando de si mesmo</h2>
+  <table>
+    <thead><tr><th>Pegadinha</th><th>Saída</th></tr></thead>
+    <tbody>
+      <tr><td>erro confiante passa pelo limiar</td><td>"bomba de chocolate" classificada como fora do escopo com 0.95</td></tr>
+      <tr><td>rota faltando sem teste de cobertura</td><td><code>KeyError: &lt;IntencaoV2.CARDAPIO_DA_SEMANA: 'cardapio_da_semana'&gt;</code></td></tr>
+      <tr><td>o valor do enum é formato gravado</td><td><code>ValueError: 'preco' is not a valid IntencaoRenomeada</code></td></tr>
+      <tr><td>valor desconhecido derruba a classificação</td><td><code>Input should be 'receita', 'preco', 'substituicao' or 'fora_do_escopo'</code></td></tr>
+    </tbody>
+  </table>
+  <p>O nome do membro (<code>PRECO</code>) pode mudar. O valor (<code>"preco"</code>) é contrato com o mundo de fora.</p>
+</section>
+
+<!-- 23 -->
+<section class="slide" data-nb="7" data-titulo="O que levar">
+  <h2>O modelo propõe, o código decide</h2>
+<pre class="saida"><code>            o modelo PROPÕE                         o código DECIDE
+  ┌───────────────────────────────┐      ┌──────────────────────────────────┐
+  │ JSON no formato do schema     │ ───► │ Pydantic: forma e tipos          │
+  │ valores do enum               │      │ Enum: vocabulário fechado        │
+  │ pedido de ferramenta          │      │ guardrail: existe? args batem?   │
+  │ intenção e confiança          │      │ regras, limites, rota, permissão │
+  └───────────────────────────────┘      └──────────────────────────────────┘</code></pre>
+  <ol>
+    <li><strong>Prompt informa, código garante.</strong> Description, instrução e schema são pedidos ao modelo.</li>
+    <li><strong>Erro silencioso é o pior erro.</strong> <code>'250 grams250 grams'</code> e <code>rotular(...) -&gt; None</code> não levantam nada.</li>
+    <li><strong>Erro de validação é feedback.</strong> Volta ao modelo em vez de derrubar o programa.</li>
+    <li><strong>Toda tabela por enum precisa de teste de cobertura.</strong> Rotas, ferramentas, permissões.</li>
+    <li><strong>O valor do enum é contrato externo.</strong> Renomeie o membro, nunca o valor.</li>
+  </ol>
+  <p>Próximo nível: contrato que conhece orçamento e despensa, permissões por perfil, custo e um pipeline testável (notebooks 07 a 10).</p>
+</section>
+
+</main>
+
+<aside class="cupom" id="cupom" aria-label="Cupom de garantias">
+  <div class="fita">
+    <div class="cab"><b>Mercado do Contrato</b>cupom de garantias<br>trilha AI_use_cases</div>
+    <hr>
+    <div id="cupom-itens"><p class="vazio">Os notebooks aparecem aqui conforme a apresentação avança.</p></div>
+    <hr>
+    <div class="totais"><span>garantias</span><span id="tot-ganhos">0</span></div>
+    <div class="totais"><span>em aberto</span><span id="tot-abertos">0</span></div>
+    <hr>
+    <div class="cab" style="margin:0">verde garante, vermelho quebra<br>riscado: resolvido adiante</div>
+  </div>
+</aside>
+
+<nav class="navegacao" aria-label="Navegação">
+  <button class="secundario" id="anterior" aria-label="Slide anterior">‹</button>
+  <button class="secundario" id="proximo" aria-label="Próximo slide">›</button>
+  <div class="progresso" aria-hidden="true"><i id="barra"></i></div>
+  <span class="dica"><kbd>o</kbd> visão geral</span>
+  <button class="secundario" id="alternar-cupom">cupom</button>
+  <span class="contador" id="contador">1 / 1</span>
+</nav>
+
+<div class="visao" id="visao" role="dialog" aria-label="Visão geral dos slides">
+  <h2>Visão geral</h2>
+  <p class="dica"><kbd>Esc</kbd> fecha</p>
+  <ol id="visao-lista"></ol>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- dados da trilha (cupom) ---------------- */
+const NOTEBOOKS = [
+  { nb: 1, nome: "01 chamada e JSON", ganho: "conversa com a API", quebras: [["quantidade vem como texto", 2]] },
+  { nb: 2, nome: "02 saída estruturada", ganho: "contrato: campos e tipos", quebras: [["unidade aceita qualquer texto", 3]] },
+  { nb: 3, nome: "03 enums e guardrails", ganho: "vocabulário fechado e escopo", quebras: [["valores absurdos passam", 5], ["modelo não sabe preços", 4]] },
+  { nb: 4, nome: "04 ferramentas", ganho: "dados reais, execução segura", quebras: [["dinheiro em float", "09"]] },
+  { nb: 5, nome: "05 regras e retry", ganho: "regras de negócio e feedback", quebras: [["regras fora do contrato", "07"]] },
+  { nb: 6, nome: "06 roteamento", ganho: "intenção vira rota", quebras: [["permissões e enum aberto", "08"]] },
+];
+
+const slides = Array.from(document.querySelectorAll(".slide"));
+const barra = document.getElementById("barra");
+const contador = document.getElementById("contador");
+const visao = document.getElementById("visao");
+const reduzMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let atual = 0;
+let impressoAte = 0;
+
+function renderCupom(nbAtual) {
+  const caixa = document.getElementById("cupom-itens");
+  const visiveis = NOTEBOOKS.filter(n => n.nb <= nbAtual);
+  if (!visiveis.length) {
+    caixa.innerHTML = '<p class="vazio">Os notebooks aparecem aqui conforme a apresentação avança.</p>';
+  } else {
+    caixa.innerHTML = "";
+    for (const n of visiveis) {
+      const item = document.createElement("div");
+      item.className = "item";
+      if (n.nb > impressoAte && !reduzMovimento) item.classList.add("imprimindo");
+      let html = `<div class="nb">${n.nome}</div><div class="ganho">+ ${n.ganho}</div>`;
+      for (const [texto, resolvidoEm] of n.quebras) {
+        const resolvida = typeof resolvidoEm === "number" && resolvidoEm <= nbAtual;
+        const destino = typeof resolvidoEm === "number"
+          ? (resolvida ? `ok em ${String(resolvidoEm).padStart(2, "0")}` : "")
+          : `avançado ${resolvidoEm}`;
+        html += `<div class="quebra${resolvida ? " resolvida" : ""}">− ${texto}${destino ? `<small>${destino}</small>` : ""}</div>`;
+      }
+      item.innerHTML = html;
+      caixa.appendChild(item);
+    }
+  }
+  impressoAte = Math.max(impressoAte, Math.min(nbAtual, 6));
+  let abertos = 0;
+  for (const n of visiveis) for (const [, r] of n.quebras) if (!(typeof r === "number" && r <= nbAtual)) abertos++;
+  document.getElementById("tot-ganhos").textContent = visiveis.length;
+  document.getElementById("tot-abertos").textContent = abertos;
+}
+
+/* ---------------- navegação ---------------- */
+function ir(indice, { atualizarHash = true } = {}) {
+  atual = Math.max(0, Math.min(slides.length - 1, indice));
+  slides.forEach((s, i) => {
+    s.classList.toggle("atual", i === atual);
+    s.setAttribute("aria-hidden", i === atual ? "false" : "true");
+    s.inert = i !== atual;
+  });
+  barra.style.width = `${((atual + 1) / slides.length) * 100}%`;
+  contador.textContent = `${atual + 1} / ${slides.length}`;
+  renderCupom(Number(slides[atual].dataset.nb));
+  document.getElementById("anterior").disabled = atual === 0;
+  document.getElementById("proximo").disabled = atual === slides.length - 1;
+  if (atualizarHash) history.replaceState(null, "", `#${atual + 1}`);
+  document.querySelectorAll("#visao-lista button").forEach((b, i) => b.setAttribute("aria-current", i === atual));
+}
+
+function montarVisao() {
+  const lista = document.getElementById("visao-lista");
+  slides.forEach((s, i) => {
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    b.innerHTML = `<span>${i + 1}</span>${s.dataset.titulo}`;
+    b.addEventListener("click", () => { fecharVisao(); ir(i); });
+    li.appendChild(b);
+    lista.appendChild(li);
+  });
+}
+function abrirVisao() { visao.classList.add("aberta"); visao.querySelectorAll("button")[atual].focus(); }
+function fecharVisao() { visao.classList.remove("aberta"); }
+
+document.getElementById("anterior").addEventListener("click", () => ir(atual - 1));
+document.getElementById("proximo").addEventListener("click", () => ir(atual + 1));
+document.getElementById("alternar-cupom").addEventListener("click", () => document.body.classList.toggle("cupom-aberto"));
+
+document.addEventListener("keydown", (e) => {
+  const alvo = e.target;
+  if (alvo.matches("input, select, textarea")) return;
+  if (alvo.matches("button") && (e.key === " " || e.key === "Enter")) return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (visao.classList.contains("aberta")) {
+    if (e.key === "Escape" || e.key === "o") { fecharVisao(); e.preventDefault(); }
+    return;
+  }
+  switch (e.key) {
+    case "ArrowRight": case "PageDown": case " ": ir(atual + 1); break;
+    case "ArrowLeft": case "PageUp": ir(atual - 1); break;
+    case "Home": ir(0); break;
+    case "End": ir(slides.length - 1); break;
+    case "o": abrirVisao(); break;
+    case "c": document.body.classList.toggle("cupom-aberto"); break;
+    case "f": if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.(); break;
+    default: return;
+  }
+  e.preventDefault();
+});
+
+document.getElementById("palco").addEventListener("click", () => document.body.classList.remove("cupom-aberto"));
+
+let toqueX = null;
+document.getElementById("palco").addEventListener("touchstart", e => { toqueX = e.touches[0].clientX; }, { passive: true });
+document.getElementById("palco").addEventListener("touchend", e => {
+  if (toqueX === null) return;
+  const dx = e.changedTouches[0].clientX - toqueX;
+  if (Math.abs(dx) > 60) ir(atual + (dx < 0 ? 1 : -1));
+  toqueX = null;
+});
+window.addEventListener("hashchange", () => ir(Number(location.hash.slice(1)) - 1 || 0, { atualizarHash: false }));
+
+/* ---------------- realce de Python ---------------- */
+const KEYWORDS = new Set("and as assert class def elif else except False for from if import in is lambda None not or raise return True try while with yield match case".split(" "));
+const BUILTINS = new Set("str int float list dict set frozenset len print isinstance type super object".split(" "));
+function escapar(t) { return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function realcar(codigo) {
+  const re = /(#[^\n]*)|([rfbu]?"""[\s\S]*?"""|[rfbu]?"(?:\\.|[^"\\\n])*"|[rfbu]?'(?:\\.|[^'\\\n])*')|(@\w+)|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)\b/g;
+  let saida = "", ultimo = 0, m;
+  while ((m = re.exec(codigo))) {
+    saida += escapar(codigo.slice(ultimo, m.index));
+    const [tok, com, str, dec, num, pal] = m;
+    if (com) saida += `<span class="c">${escapar(com)}</span>`;
+    else if (str) saida += `<span class="s">${escapar(str)}</span>`;
+    else if (dec) saida += `<span class="d">${escapar(dec)}</span>`;
+    else if (num) saida += `<span class="n">${num}</span>`;
+    else if (KEYWORDS.has(pal)) saida += `<span class="k">${pal}</span>`;
+    else if (BUILTINS.has(pal)) saida += `<span class="b">${pal}</span>`;
+    else saida += escapar(tok);
+    ultimo = m.index + tok.length;
+  }
+  return saida + escapar(codigo.slice(ultimo));
+}
+document.querySelectorAll("pre code.py").forEach(el => { el.innerHTML = realcar(el.textContent); });
+
+/* ---------------- utilitários "à moda Python" ---------------- */
+function pyRepr(v) { return typeof v === "string" ? `'${v.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}'` : String(v); }
+function pyG(x) { return String(Number(Number(x).toPrecision(6))); }           // format(x, "g") para números comuns
+function pyFloat(x) { return Number.isInteger(x) ? `${x}.0` : String(x); }    // repr de float
+function pyJson(v) {                                                            // json.dumps(..., ensure_ascii=False)
+  if (v === null) return "null";
+  if (Array.isArray(v)) return `[${v.map(pyJson).join(", ")}]`;
+  if (typeof v === "object") return `{${Object.entries(v).map(([k, x]) => `${JSON.stringify(k)}: ${x && x.__float ? pyFloat(x.v) : pyJson(x)}`).join(", ")}}`;
+  return JSON.stringify(v);
+}
+const F = v => ({ __float: true, v });
+function mostrar(id, texto, bom) {
+  const el = document.getElementById(id);
+  el.textContent = texto;
+  el.classList.toggle("bom", bom === true);
+  el.classList.toggle("ruim", bom === false);
+}
+
+/* ---------------- demo: dobrar (01) ---------------- */
+function demoDobro() {
+  const valor = document.getElementById("dobro-valor").value;
+  const texto = document.getElementById("dobro-texto").checked;
+  if (texto) {
+    mostrar("dobro-saida", `primeiro['amount'] * 2: ${pyRepr(valor + valor)}\n# str * 2 repete o texto, sem erro`, false);
+    return;
+  }
+  const n = Number(valor.trim());
+  if (valor.trim() === "" || Number.isNaN(n)) {
+    mostrar("dobro-saida", `json.loads: JSONDecodeError\n# sem aspas, ${valor.trim() || "(vazio)"} não é JSON válido como número`, false);
+  } else {
+    const ehFloat = /[.eE]/.test(valor.trim());                                  // 250 -> int, 250.0 -> float
+    mostrar("dobro-saida", `primeiro['amount'] * 2: ${ehFloat ? pyFloat(n * 2) : String(n * 2)}`, true);
+  }
+}
+["dobro-valor", "dobro-texto"].forEach(id => document.getElementById(id).addEventListener("input", demoDobro));
+
+/* ---------------- demo: unidade (03) ---------------- */
+const UNIDADES = ["g", "kg", "ml", "l", "un"];
+function demoUnidade() {
+  let v = document.getElementById("unidade-valor").value;
+  if (document.getElementById("unidade-normalizar").checked) v = v.trim().toLowerCase();
+  if (UNIDADES.includes(v)) {
+    mostrar("unidade-saida", `unidade: <Unidade.${v.toUpperCase()}: '${v}'>`, true);
+  } else {
+    mostrar("unidade-saida", `('unidade',): Input should be 'g', 'kg', 'ml', 'l' or 'un'\n# valor recebido: ${pyRepr(v)}`, false);
+  }
+}
+["unidade-valor", "unidade-normalizar"].forEach(id => document.getElementById(id).addEventListener("input", demoUnidade));
+
+/* ---------------- demo: escopo (03) ---------------- */
+function demoEscopo() {
+  const tipo = document.getElementById("escopo-tipo").value;
+  const lista = document.getElementById("escopo-lista").checked;
+  const motivo = document.getElementById("escopo-motivo").checked;
+  if (!["receita", "fora_do_escopo"].includes(tipo)) {
+    return mostrar("escopo-saida", "ValidationError: Input should be 'receita' or 'fora_do_escopo'", false);
+  }
+  if (tipo === "receita" && !lista) {
+    return mostrar("escopo-saida", "ValidationError: Value error, tipo 'receita' exige 'lista'", false);
+  }
+  if (tipo === "fora_do_escopo" && (lista || !motivo)) {
+    return mostrar("escopo-saida", "ValidationError: Value error, tipo 'fora_do_escopo' exige 'motivo' e não aceita 'lista'", false);
+  }
+  mostrar("escopo-saida", tipo === "receita"
+    ? "tratar(...): Lista de Pizza margherita: 5 itens"
+    : "tratar(...): Só ajudo com listas de compras. (pergunta de geografia, não de compras)", true);
+}
+["escopo-tipo", "escopo-lista", "escopo-motivo"].forEach(id => document.getElementById(id).addEventListener("input", demoEscopo));
+
+/* ---------------- demo: ferramenta (04) ---------------- */
+const PRECOS = { "farinha de trigo": [6.5, "kg"], "muçarela de búfala": [89.9, "kg"], "tomate italiano": [1.2, "un"], "azeite": [45.0, "l"], "manjericão fresco": [4.0, "un"] };
+const DESPENSA = { "farinha de trigo": [1, "kg"], "azeite": [0.5, "l"] };
+function demoFerramenta() {
+  const nome = document.getElementById("ferr-nome").value;
+  const argsTexto = document.getElementById("ferr-args").value;
+  if (!["consultar_preco", "verificar_despensa"].includes(nome)) {
+    return mostrar("ferr-saida", pyJson({ erro: `ferramenta desconhecida: ${nome}` }), false);
+  }
+  let args;
+  try { args = JSON.parse(argsTexto); }
+  catch { return mostrar("ferr-saida", pyJson({ erro: "argumentos inválidos", detalhes: [{ type: "json_invalid", loc: [], msg: "Invalid JSON" }] }), false); }
+  if (args === null || typeof args !== "object" || Array.isArray(args)) {
+    return mostrar("ferr-saida", pyJson({ erro: "argumentos inválidos", detalhes: [{ type: "model_type", loc: [], msg: "Input should be an object" }] }), false);
+  }
+  const detalhes = [];
+  for (const chave of Object.keys(args)) if (chave !== "nome") detalhes.push({ type: "extra_forbidden", loc: [chave], msg: "Extra inputs are not permitted" });
+  if (!("nome" in args)) detalhes.push({ type: "missing", loc: ["nome"], msg: "Field required" });
+  else if (typeof args.nome !== "string") detalhes.push({ type: "string_type", loc: ["nome"], msg: "Input should be a valid string" });
+  if (detalhes.length) return mostrar("ferr-saida", pyJson({ erro: "argumentos inválidos", detalhes }), false);
+  const item = args.nome;
+  if (nome === "consultar_preco") {
+    if (!(item in PRECOS)) return mostrar("ferr-saida", pyJson({ encontrado: false, nome: item }), true);
+    const [preco, por] = PRECOS[item];
+    return mostrar("ferr-saida", pyJson({ encontrado: true, nome: item, preco: F(preco), por }), true);
+  }
+  const [quantidade, unidade] = DESPENSA[item] || [0, null];
+  mostrar("ferr-saida", pyJson({ nome: item, tem: quantidade > 0, quantidade: Number.isInteger(quantidade) ? quantidade : F(quantidade), unidade }), true);
+}
+["ferr-nome", "ferr-args"].forEach(id => document.getElementById(id).addEventListener("input", demoFerramenta));
+document.querySelectorAll("#demo-ferramenta button[data-args]").forEach(b => b.addEventListener("click", () => {
+  document.getElementById("ferr-args").value = b.dataset.args;
+  demoFerramenta();
+}));
+
+/* ---------------- demo: regras (05) ---------------- */
+const LIMITE = { g: 400, kg: 0.4, ml: 300, l: 0.3, un: 4 };
+const INGREDIENTES_INICIAIS = [["sal", 3, "kg"], ["muçarela de búfala", 40, "un"], ["Sal", 5, "g"]];
+function montarLinhasRegras() {
+  const caixa = document.getElementById("regras-linhas");
+  INGREDIENTES_INICIAIS.forEach(([nome, qtd, un], i) => {
+    caixa.insertAdjacentHTML("beforeend",
+      `<input type="text" aria-label="nome ${i + 1}" data-campo="nome" value="${nome}">` +
+      `<input type="number" aria-label="quantidade ${i + 1}" data-campo="qtd" value="${qtd}" step="any">` +
+      `<select aria-label="unidade ${i + 1}" data-campo="un">${UNIDADES.map(u => `<option${u === un ? " selected" : ""}>${u}</option>`).join("")}</select>`);
+  });
+  caixa.addEventListener("input", demoRegras);
+}
+function demoRegras() {
+  const porcoes = Number(document.getElementById("regras-porcoes").value);
+  if (!Number.isInteger(porcoes) || porcoes < 1 || porcoes > 20) {
+    return mostrar("regras-saida", `ValueError: porções devem estar entre 1 e 20, recebido ${document.getElementById("regras-porcoes").value}\n# validar_pedido: nenhuma chamada ao modelo`, false);
+  }
+  const campos = Array.from(document.querySelectorAll("#regras-linhas [data-campo]"));
+  const itens = [];
+  for (let i = 0; i < campos.length; i += 3) {
+    itens.push({ nome: campos[i].value, qtd: Number(campos[i + 1].value), un: campos[i + 2].value });
+  }
+  const invalidos = itens.filter(it => !(it.qtd > 0));
+  if (invalidos.length) {
+    return mostrar("regras-saida", "ValidationError: quantidade: Input should be greater than 0\n# o contrato barra antes das regras", false);
+  }
+  const problemas = [];
+  for (const it of itens) {
+    const limite = LIMITE[it.un] * porcoes;
+    if (it.qtd > limite) problemas.push(`${it.nome}: ${pyG(it.qtd)} ${it.un} passa do limite de ${pyG(limite)} ${it.un} para ${porcoes} porções`);
+  }
+  const nomes = itens.map(it => it.nome.trim().toLowerCase());
+  const repetidos = [...new Set(nomes.filter(n => nomes.indexOf(n) !== nomes.lastIndexOf(n)))].sort();
+  for (const n of repetidos) problemas.push(`ingrediente repetido: ${n}`);
+  mostrar("regras-saida", problemas.length ? problemas.map(p => `- ${p}`).join("\n") : "verificar_regras(lista): []", problemas.length === 0);
+}
+document.getElementById("regras-porcoes").addEventListener("input", demoRegras);
+
+/* ---------------- demo: retry (05) ---------------- */
+const ROTEIROS = {
+  corrige: { tamanhos: [1162, 1533], erros: [["farinha de trigo: 2 kg passa do limite de 0.8 kg para 2 porções"], []] },
+  sempre: { tamanhos: [1162, 1533, 1904], erros: Array(3).fill(["farinha de trigo: 2 kg passa do limite de 0.8 kg para 2 porções"]) },
+};
+let passoRetry = 0;
+function demoRetry() {
+  const r = ROTEIROS[document.getElementById("retry-roteiro").value];
+  const maximo = 1904;
+  const barras = document.getElementById("retry-barras");
+  barras.innerHTML = "";
+  for (let i = 0; i < passoRetry; i++) {
+    barras.insertAdjacentHTML("beforeend",
+      `<div class="barra-env"><span>tentativa ${i + 1}</span><span class="trilho"><i style="width:${(r.tamanhos[i] / maximo) * 100}%"></i></span><span>${r.tamanhos[i]}</span></div>`);
+  }
+  const botao = document.getElementById("retry-passo");
+  if (passoRetry === 0) {
+    botao.disabled = false;
+    return mostrar("retry-saida", "validar_pedido('Pizza margherita', 2): ok\n# caracteres enviados por tentativa aparecem acima", undefined);
+  }
+  const erros = r.erros[passoRetry - 1];
+  const fim = erros.length === 0 || passoRetry === 3;
+  botao.disabled = fim || passoRetry >= r.tamanhos.length;
+  if (erros.length === 0) {
+    return mostrar("retry-saida", `resultado.tentativas: ${passoRetry}\nresultado.erros_por_tentativa: [${r.erros.slice(0, passoRetry).map(e => `[${e.map(pyRepr).join(", ")}]`).join(", ")}]`, true);
+  }
+  if (passoRetry === 3) {
+    return mostrar("retry-saida", `RuntimeError: 3 tentativas sem resposta válida; últimos erros: [${erros.map(pyRepr).join(", ")}]`, false);
+  }
+  mostrar("retry-saida", `tentativa ${passoRetry}: ${erros.join("; ")}\n# a resposta e os erros voltam ao modelo como novas mensagens`, false);
+}
+document.getElementById("retry-passo").addEventListener("click", () => { passoRetry++; demoRetry(); });
+document.getElementById("retry-reiniciar").addEventListener("click", () => { passoRetry = 0; demoRetry(); });
+document.getElementById("retry-roteiro").addEventListener("input", () => { passoRetry = 0; demoRetry(); });
+
+/* ---------------- demo: rota (06) ---------------- */
+const ROTAS = {
+  receita: ["gerar lista de compras para 'pizza margherita'", ["verificar_despensa"]],
+  preco: ["consultar preço de 'muçarela'", ["consultar_preco"]],
+  substituicao: ["sugerir substituto para 'manjericão' (verificando a despensa)", ["verificar_despensa"]],
+  fora_do_escopo: ["recusar com educação: só ajudo com compras de mercado", []],
+};
+function demoRota() {
+  const intencao = document.getElementById("rota-intencao").value;
+  const confianca = Number(document.getElementById("rota-confianca").value);
+  document.getElementById("rota-valor").textContent = confianca.toFixed(2);
+  if (!(intencao in ROTAS)) {
+    return mostrar("rota-saida", "ValidationError: Input should be 'receita', 'preco', 'substituicao' or 'fora_do_escopo'\n# o pedido inteiro se perde; o avançado (08) mostra o enum aberto", false);
+  }
+  if (confianca < 0.7) {
+    return mostrar("rota-saida", `rotear(...): revisão humana (confiança ${confianca.toFixed(2)} < 0.7)`, undefined);
+  }
+  const [resposta, ferramentas] = ROTAS[intencao];
+  mostrar("rota-saida", `rotear(...): ${resposta}\nferramentas permitidas: [${ferramentas.map(pyRepr).join(", ")}]`, true);
+}
+["rota-intencao", "rota-confianca"].forEach(id => document.getElementById(id).addEventListener("input", demoRota));
+
+/* ---------------- início ---------------- */
+montarVisao();
+montarLinhasRegras();
+demoDobro(); demoUnidade(); demoEscopo(); demoFerramenta(); demoRegras(); demoRetry(); demoRota();
+ir((Number(location.hash.slice(1)) || 1) - 1, { atualizarHash: false });
+</script>
+</body>
+</html>

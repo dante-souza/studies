@@ -21,6 +21,16 @@ cada notebook termina mostrando **o que ainda quebra**: é esse problema que o p
   10 pipeline completo        → settings do ambiente, cache, log sem dados sensíveis, testes
 ```
 
+## Ler a trilha inteira no navegador
+
+[`trilha.html`](trilha.html) reúne os 10 notebooks executados num arquivo único, com as cores das saídas preservadas. Abra com duplo clique (funciona offline; o GitHub mostra só o código-fonte de arquivos `.html`).
+
+- índice por nível e **cupom de garantias**: o que cada notebook garante e o que ainda quebra, riscado quando um notebook adiante resolve
+- **só pegadinhas** (`s`): esconde tudo menos as seções "⚠️ O que ainda quebra" dos 10 notebooks, para revisão
+- código recolhível (`c`), tema claro/escuro (`t`), `n`/`p` entre notebooks, `j`/`k` entre seções; Ctrl+F busca em tudo
+
+Depois de rodar os notebooks (por exemplo, as células de API com o seu `.env`), regenere com `python gerar_trilha_html.py`.
+
 ## Apresentação
 
 Básico e intermediário em slides: [`apresentacao/basico_e_intermediario.html`](apresentacao/basico_e_intermediario.html)
@@ -72,6 +82,7 @@ O `.env` **não vai para o git** (está no `.gitignore`). O `load_dotenv()` proc
 | [`03_avancado/mercado.py`](03_avancado/mercado.py) | peças de 07–09 reunidas para o pipeline do 10 |
 | [`prettifier.py`](prettifier.py) | exibição portátil (arquivo único, depende só de `rich`): `show` (o `print` com cores), `show_json`, `show_panel`, `show_table`, `styled`, `view_file`, `rich_handler` |
 | [`logger_general.py`](logger_general.py) | registro portátil (arquivo único, só biblioteca padrão, ANSI): `GeneralLogger`, `JsonlWriter` |
+| [`gerar_trilha_html.py`](gerar_trilha_html.py) | gera o `trilha.html` a partir dos notebooks executados |
 
 ## Saída colorida
 
@@ -79,7 +90,8 @@ Dois arquivos independentes, cada um copiável sozinho para outro projeto:
 
 - [`prettifier.py`](prettifier.py) **exibe** (depende de `rich`). Cada notebook troca o `print` por `show`, que mantém o padrão
   `rótulo: valor` com cores: rótulo em azul, erros em vermelho, números, strings e booleanos destacados, sem interpretar
-  marcação (`[texto]` sai como texto). Também: JSON destacado com tons por `status`, prompts em painel com quebra de linha,
+  marcação (`[texto]` sai como texto). Um JSON, sozinho ou no formato `rótulo: {json}`, sai com cores de chave e valor: numa
+  linha quando cabe, indentado quando não cabe (`show(texto, detect_json=False)` desliga). Também: JSON destacado com tons por `status`, prompts em painel com quebra de linha,
   tabelas e leitura de JSON, JSONL e logs com cor. `python prettifier.py selftest` testa o módulo.
 - [`logger_general.py`](logger_general.py) **registra** (só biblioteca padrão, cores ANSI próprias). Eventos de execução
   (rodadas de ferramenta, tentativas, negações de política, etapas do pipeline) saem com horário e nível: `INFO` em verde,

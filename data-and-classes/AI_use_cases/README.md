@@ -70,12 +70,20 @@ O `.env` **não vai para o git** (está no `.gitignore`). O `load_dotenv()` proc
 | [`03_avancado/contrato.py`](03_avancado/contrato.py) | o mesmo + `Ferramenta` (04) e `Intencao` (06) |
 | [`03_avancado/llm_simulado.py`](03_avancado/llm_simulado.py) | cliente simulado no formato da OpenAI |
 | [`03_avancado/mercado.py`](03_avancado/mercado.py) | peças de 07–09 reunidas para o pipeline do 10 |
-| [`saida.py`](saida.py) | saída formatada: `mostrar` (o `print` com cores), JSON, prompts em painel e tabelas via `rich`; eventos de execução via `logger_general` |
-| [`logger_general.py`](logger_general.py) | logger portátil (só biblioteca padrão): `GeneralLogger`, `JsonlWriter`, `view_file` |
+| [`prettifier.py`](prettifier.py) | exibição portátil (arquivo único, depende só de `rich`): `show` (o `print` com cores), `show_json`, `show_panel`, `show_table`, `styled`, `view_file`, `rich_handler` |
+| [`logger_general.py`](logger_general.py) | registro portátil (arquivo único, só biblioteca padrão, ANSI): `GeneralLogger`, `JsonlWriter` |
 
 ## Saída colorida
 
-Cada notebook começa importando o [`saida.py`](saida.py). Resultados saem pelo `rich`, com cores no padrão `rótulo: valor`, JSON destacado, prompts em painel com quebra de linha e tabelas. Eventos de execução (rodadas de ferramenta, tentativas, negações de política, etapas do pipeline) saem pelo `GeneralLogger` do [`logger_general.py`](logger_general.py), com horário e nível: `INFO` em verde, `WARNING` em amarelo.
+Dois arquivos independentes, cada um copiável sozinho para outro projeto:
+
+- [`prettifier.py`](prettifier.py) **exibe** (depende de `rich`). Cada notebook troca o `print` por `show`, que mantém o padrão
+  `rótulo: valor` com cores: rótulo em azul, erros em vermelho, números, strings e booleanos destacados, sem interpretar
+  marcação (`[texto]` sai como texto). Também: JSON destacado com tons por `status`, prompts em painel com quebra de linha,
+  tabelas e leitura de JSON, JSONL e logs com cor. `python prettifier.py selftest` testa o módulo.
+- [`logger_general.py`](logger_general.py) **registra** (só biblioteca padrão, cores ANSI próprias). Eventos de execução
+  (rodadas de ferramenta, tentativas, negações de política, etapas do pipeline) saem com horário e nível: `INFO` em verde,
+  `WARNING` em amarelo. O `JsonlWriter` grava eventos sem cor; quem lê com cor é o `view_file` do prettifier.
 
 As cores são códigos ANSI na saída: aparecem no Jupyter, no VS Code e no terminal. `NO_COLOR=1` desliga. O import usa `sys.path.insert(0, str(Path.cwd().parent))`, ou seja, supõe o notebook rodando na própria pasta, que é o padrão do Jupyter e do VS Code.
 

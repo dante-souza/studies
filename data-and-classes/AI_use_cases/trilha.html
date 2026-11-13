@@ -1070,7 +1070,7 @@ a declarar o tipo — e o código trata cada tipo explicitamente.</p>
 <span class="n">AI_MODEL</span> <span class="o">=</span> <span class="s2">"gpt-4o-mini"</span>
 <span class="n">ai_client</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">,</span> <span class="n">base_url</span><span class="o">=</span><span class="n">openai_base_url</span><span class="p">)</span>
 </code></pre></div>
-<div class="celula"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[7]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="k">def</span><span class="w"> </span><span class="nf">prompt_assistente</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="celula"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[8]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="k">def</span><span class="w"> </span><span class="nf">prompt_assistente</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="s2">"Você é um assistente de listas de compras. Se o usuário pedir um prato ou receita, gere a lista com ingredientes "</span>
         <span class="s2">"in natura e sistema métrico (tipo = receita). Para qualquer outro pedido, responda tipo = fora_do_escopo "</span>
@@ -1122,7 +1122,7 @@ a declarar o tipo — e o código trata cada tipo explicitamente.</p>
 │ <span style="color: #2472c8; text-decoration-color: #2472c8; font-weight: bold">&quot;title&quot;</span>: <span style="color: #0dbc79; text-decoration-color: #0dbc79">&quot;RespostaAssistente&quot;</span>, <span style="color: #2472c8; text-decoration-color: #2472c8; font-weight: bold">&quot;type&quot;</span>: <span style="color: #0dbc79; text-decoration-color: #0dbc79">&quot;object&quot;</span><span style="font-weight: bold">}</span>                                                           │
 ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 </pre></div>
-<div class="celula api nao-executada"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">API, não executada (precisa do .env)</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="c1"># api: dois pedidos — um no escopo, outro fora</span>
+<div class="celula api"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[9] API, executada com o .env</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="c1"># api: dois pedidos — um no escopo, outro fora</span>
 <span class="k">for</span> <span class="n">pedido</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"Pizza margherita para 2 pessoas"</span><span class="p">,</span> <span class="s2">"Qual a capital da França?"</span><span class="p">]:</span>
     <span class="n">chat_completion</span> <span class="o">=</span> <span class="n">ai_client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
         <span class="n">model</span><span class="o">=</span><span class="n">AI_MODEL</span><span class="p">,</span>
@@ -1131,10 +1131,12 @@ a declarar o tipo — e o código trata cada tipo explicitamente.</p>
     <span class="n">texto</span> <span class="o">=</span> <span class="n">chat_completion</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span>
     <span class="n">resposta_validada</span> <span class="o">=</span> <span class="n">SaidaAssistente</span><span class="o">.</span><span class="n">validate_python</span><span class="p">(</span><span class="n">texto</span><span class="p">)</span>
     <span class="n">show</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">pedido</span><span class="si">!r}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">tratar</span><span class="p">(</span><span class="n">resposta_validada</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</code></pre></div>
+</code></pre><pre class="saida"><span style="color: #0dbc79; text-decoration-color: #0dbc79">&#x27;Pizza margherita para 2 pessoas&#x27;</span> -&gt; Lista de Pizza margherita: <span style="color: #11a8cd; text-decoration-color: #11a8cd; font-weight: bold">8</span> itens
+<span style="color: #0dbc79; text-decoration-color: #0dbc79">&#x27;Qual a capital da França?&#x27;</span> -&gt; Só ajudo com listas de compras. <span style="font-weight: bold">(</span>Pergunta não relacionada a lista de compras.<span style="font-weight: bold">)</span>
+</pre></div>
 <section class="md"><p>Sem chave, o mesmo fluxo com respostas no formato esperado (<em>exemplos construídos</em>):</p>
 </section>
-<div class="celula"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[8]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="n">respostas_construidas</span> <span class="o">=</span> <span class="p">{</span>
+<div class="celula"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[10]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="n">respostas_construidas</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">"Pizza margherita para 2 pessoas"</span><span class="p">:</span> <span class="s1">'{"tipo": "receita", "lista": '</span> <span class="o">+</span> <span class="n">resposta</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s2">"}"</span><span class="p">,</span>
     <span class="s2">"Qual a capital da França?"</span><span class="p">:</span> <span class="s1">'{"tipo": "fora_do_escopo", "motivo": "pergunta de geografia, não de compras"}'</span><span class="p">,</span>
 <span class="p">}</span>
@@ -1146,7 +1148,7 @@ a declarar o tipo — e o código trata cada tipo explicitamente.</p>
 </pre></div>
 <section class="md"><p>E as combinações incoerentes são barradas antes de chegar ao <code>tratar</code>:</p>
 </section>
-<div class="celula"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[9]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="n">incoerentes</span> <span class="o">=</span> <span class="p">{</span>
+<div class="celula"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[11]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="n">incoerentes</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">"receita sem lista"</span><span class="p">:</span> <span class="s1">'{"tipo": "receita"}'</span><span class="p">,</span>
     <span class="s2">"fora do escopo sem motivo"</span><span class="p">:</span> <span class="s1">'{"tipo": "fora_do_escopo"}'</span><span class="p">,</span>
     <span class="s2">"tipo inventado"</span><span class="p">:</span> <span class="s1">'{"tipo": "piada", "motivo": "o usuário pediu uma piada"}'</span><span class="p">,</span>
@@ -1163,7 +1165,7 @@ a declarar o tipo — e o código trata cada tipo explicitamente.</p>
 <section class="md pegadinha"><h2 id="nb-03-o-que-ainda-quebra" class="secao">⚠️ O que ainda quebra</h2>
 <p><strong>1. Enum compara texto exato.</strong> <code>&quot;G&quot;</code> ou <code>&quot; g&quot;</code> não são <code>&quot;g&quot;</code> — e modelos variam caixa e espaços:</p>
 </section>
-<div class="celula pegadinha"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[10]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="k">for</span> <span class="n">valor</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"g"</span><span class="p">,</span> <span class="s2">"G"</span><span class="p">,</span> <span class="s2">" g"</span><span class="p">,</span> <span class="s2">"gramas"</span><span class="p">]:</span>
+<div class="celula pegadinha"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[12]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="k">for</span> <span class="n">valor</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"g"</span><span class="p">,</span> <span class="s2">"G"</span><span class="p">,</span> <span class="s2">" g"</span><span class="p">,</span> <span class="s2">"gramas"</span><span class="p">]:</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">show</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">valor</span><span class="si">!r}</span><span class="s2">: </span><span class="si">{</span><span class="n">Unidade</span><span class="p">(</span><span class="n">valor</span><span class="p">)</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
@@ -1176,7 +1178,7 @@ a declarar o tipo — e o código trata cada tipo explicitamente.</p>
 <section class="md pegadinha"><p>Para variações <strong>inofensivas</strong> (caixa, espaços), normalizar antes de validar resolve. Sinônimos (<code>&quot;gramas&quot;</code>) é decisão de
 negócio: ou entram numa tabela explícita, ou continuam sendo erro.</p>
 </section>
-<div class="celula pegadinha"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[11]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="k">def</span><span class="w"> </span><span class="nf">normalizar_texto</span><span class="p">(</span><span class="n">valor</span><span class="p">):</span>
+<div class="celula pegadinha"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[13]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="k">def</span><span class="w"> </span><span class="nf">normalizar_texto</span><span class="p">(</span><span class="n">valor</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">valor</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">valor</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">valor</span>
 
 
@@ -1194,7 +1196,7 @@ negócio: ou entram numa tabela explícita, ou continuam sendo erro.</p>
 <section class="md pegadinha"><p><strong>2. <code>match</code> sem <code>case _</code> falha em silêncio quando o enum cresce.</strong> Se amanhã entrar um tipo novo e ninguém atualizar o <code>match</code>,
 a função devolve <code>None</code> sem erro:</p>
 </section>
-<div class="celula pegadinha"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[12]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="k">class</span><span class="w"> </span><span class="nc">TipoPedidoV2</span><span class="p">(</span><span class="n">StrEnum</span><span class="p">):</span>
+<div class="celula pegadinha"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[14]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="k">class</span><span class="w"> </span><span class="nc">TipoPedidoV2</span><span class="p">(</span><span class="n">StrEnum</span><span class="p">):</span>
     <span class="n">RECEITA</span> <span class="o">=</span> <span class="s2">"receita"</span>
     <span class="n">FORA_DO_ESCOPO</span> <span class="o">=</span> <span class="s2">"fora_do_escopo"</span>
     <span class="n">SUBSTITUICAO</span> <span class="o">=</span> <span class="s2">"substituicao"</span>  <span class="c1"># novo</span>
@@ -1230,7 +1232,7 @@ a função devolve <code>None</code> sem erro:</p>
 </pre></div>
 <section class="md pegadinha"><p><strong>3. Enum garante o vocabulário, não o bom senso.</strong> Tudo abaixo é válido pelo contrato (<em>exemplo construído</em>):</p>
 </section>
-<div class="celula pegadinha"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[13]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="n">absurda</span> <span class="o">=</span> <span class="p">{</span>
+<div class="celula pegadinha"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[15]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="n">absurda</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">"prato"</span><span class="p">:</span> <span class="s2">"Pizza margherita"</span><span class="p">,</span> <span class="s2">"porcoes"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"ingredientes"</span><span class="p">:</span> <span class="p">[</span>
         <span class="p">{</span><span class="s2">"nome"</span><span class="p">:</span> <span class="s2">"sal"</span><span class="p">,</span> <span class="s2">"quantidade"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">"unidade"</span><span class="p">:</span> <span class="s2">"kg"</span><span class="p">,</span> <span class="s2">"categoria"</span><span class="p">:</span> <span class="s2">"mercearia"</span><span class="p">},</span>
         <span class="p">{</span><span class="s2">"nome"</span><span class="p">:</span> <span class="s2">"muçarela de búfala"</span><span class="p">,</span> <span class="s2">"quantidade"</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="s2">"unidade"</span><span class="p">:</span> <span class="s2">"un"</span><span class="p">,</span> <span class="s2">"categoria"</span><span class="p">:</span> <span class="s2">"laticinios"</span><span class="p">},</span>
@@ -2005,7 +2007,7 @@ ganha uma <strong>rota</strong>: uma função, e as ferramentas que ela pode usa
 <span class="n">AI_MODEL</span> <span class="o">=</span> <span class="s2">"gpt-4o-mini"</span>
 <span class="n">ai_client</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">,</span> <span class="n">base_url</span><span class="o">=</span><span class="n">openai_base_url</span><span class="p">)</span>
 </code></pre></div>
-<div class="celula api nao-executada"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">API, não executada (precisa do .env)</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="c1"># api: classificar pedidos reais</span>
+<div class="celula api"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[8] API, executada com o .env</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="c1"># api: classificar pedidos reais</span>
 <span class="n">pedidos</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">"Pizza margherita para 4 pessoas"</span><span class="p">,</span>
     <span class="s2">"Quanto está o quilo da muçarela?"</span><span class="p">,</span>
@@ -2020,10 +2022,15 @@ ganha uma <strong>rota</strong>: uma função, e as ferramentas que ela pode usa
     <span class="p">)</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span>
     <span class="n">classificacao</span> <span class="o">=</span> <span class="n">saida_llm</span><span class="p">(</span><span class="n">Classificacao</span><span class="p">)</span><span class="o">.</span><span class="n">validate_python</span><span class="p">(</span><span class="n">texto</span><span class="p">)</span>
     <span class="n">show</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">pedido</span><span class="si">!r}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">classificacao</span><span class="o">.</span><span class="n">intencao</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">classificacao</span><span class="o">.</span><span class="n">confianca</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">) -&gt; </span><span class="si">{</span><span class="n">rotear</span><span class="p">(</span><span class="n">classificacao</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</code></pre></div>
+</code></pre><pre class="saida"><span style="color: #0dbc79; text-decoration-color: #0dbc79">&#x27;Pizza margherita para 4 pessoas&#x27;</span> -&gt; receita <span style="font-weight: bold">(</span><span style="color: #11a8cd; text-decoration-color: #11a8cd; font-weight: bold">0.90</span><span style="font-weight: bold">)</span> -&gt; gerar lista de compras para <span style="color: #0dbc79; text-decoration-color: #0dbc79">&#x27;Pizza margherita&#x27;</span>
+<span style="color: #0dbc79; text-decoration-color: #0dbc79">&#x27;Quanto está o quilo da muçarela?&#x27;</span> -&gt; preco <span style="font-weight: bold">(</span><span style="color: #11a8cd; text-decoration-color: #11a8cd; font-weight: bold">0.90</span><span style="font-weight: bold">)</span> -&gt; consultar preço de <span style="color: #0dbc79; text-decoration-color: #0dbc79">&#x27;muçarela&#x27;</span>
+<span style="color: #0dbc79; text-decoration-color: #0dbc79">&#x27;Não tenho manjericão, uso o quê?&#x27;</span> -&gt; substituicao <span style="font-weight: bold">(</span><span style="color: #11a8cd; text-decoration-color: #11a8cd; font-weight: bold">0.90</span><span style="font-weight: bold">)</span> -&gt; sugerir substituto para <span style="color: #0dbc79; text-decoration-color: #0dbc79">&#x27;manjericão&#x27;</span> <span style="font-weight: bold">(</span>verificando
+a despensa<span style="font-weight: bold">)</span>
+<span style="color: #0dbc79; text-decoration-color: #0dbc79">&#x27;Me indica um filme&#x27;</span> -&gt; fora_do_escopo <span style="font-weight: bold">(</span><span style="color: #11a8cd; text-decoration-color: #11a8cd; font-weight: bold">1.00</span><span style="font-weight: bold">)</span> -&gt; recusar com educação: só ajudo com compras de mercado
+</pre></div>
 <section class="md"><p>Sem chave, com classificações <strong>construídas</strong> no formato do contrato:</p>
 </section>
-<div class="celula"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[7]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="n">construidas</span> <span class="o">=</span> <span class="p">{</span>
+<div class="celula"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[9]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="n">construidas</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">"Pizza margherita para 4 pessoas"</span><span class="p">:</span> <span class="s1">'{"intencao": "receita", "confianca": 0.95, "prato": "pizza margherita"}'</span><span class="p">,</span>
     <span class="s2">"Quanto está o quilo da muçarela?"</span><span class="p">:</span> <span class="s1">'{"intencao": "preco", "confianca": 0.9, "ingrediente": "muçarela"}'</span><span class="p">,</span>
     <span class="s2">"Não tenho manjericão, uso o quê?"</span><span class="p">:</span> <span class="s1">'{"intencao": "substituicao", "confianca": 0.85, "ingrediente": "manjericão"}'</span><span class="p">,</span>
@@ -2053,7 +2060,7 @@ ganha uma <strong>rota</strong>: uma função, e as ferramentas que ela pode usa
 <p><strong>1. A confiança é o modelo falando de si mesmo.</strong> Não é uma probabilidade calibrada. Um erro pode vir com 0,95 e passar direto
 pelo limiar (<em>exemplo construído</em>: &quot;bomba de chocolate&quot; é um doce):</p>
 </section>
-<div class="celula pegadinha"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[8]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="n">errada_e_confiante</span> <span class="o">=</span> <span class="n">Classificacao</span><span class="o">.</span><span class="n">model_validate_json</span><span class="p">(</span><span class="s1">'{"intencao": "fora_do_escopo", "confianca": 0.95}'</span><span class="p">)</span>
+<div class="celula pegadinha"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[10]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="n">errada_e_confiante</span> <span class="o">=</span> <span class="n">Classificacao</span><span class="o">.</span><span class="n">model_validate_json</span><span class="p">(</span><span class="s1">'{"intencao": "fora_do_escopo", "confianca": 0.95}'</span><span class="p">)</span>
 <span class="n">show</span><span class="p">(</span><span class="sa">f</span><span class="s2">"'Como faço bomba de chocolate?' -&gt; </span><span class="si">{</span><span class="n">rotear</span><span class="p">(</span><span class="n">errada_e_confiante</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre><pre class="saida"><span style="color: #0dbc79; text-decoration-color: #0dbc79">&#x27;Como faço bomba de chocolate?&#x27;</span> -&gt; recusar com educação: só ajudo com compras de mercado
 </pre></div>
@@ -2061,7 +2068,7 @@ pelo limiar (<em>exemplo construído</em>: &quot;bomba de chocolate&quot; é um 
 conhecida e conferir a taxa de acerto — o <a href="#nb-10">10</a> monta esse tipo de teste.</p>
 <p><strong>2. Rota faltando sem o teste de cobertura = <code>KeyError</code> em produção.</strong></p>
 </section>
-<div class="celula pegadinha"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[9]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="k">class</span><span class="w"> </span><span class="nc">IntencaoV2</span><span class="p">(</span><span class="n">StrEnum</span><span class="p">):</span>
+<div class="celula pegadinha"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[11]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="k">class</span><span class="w"> </span><span class="nc">IntencaoV2</span><span class="p">(</span><span class="n">StrEnum</span><span class="p">):</span>
     <span class="n">RECEITA</span> <span class="o">=</span> <span class="s2">"receita"</span>
     <span class="n">CARDAPIO_DA_SEMANA</span> <span class="o">=</span> <span class="s2">"cardapio_da_semana"</span>  <span class="c1"># nova, sem rota</span>
 
@@ -2078,7 +2085,7 @@ conhecida e conferir a taxa de acerto — o <a href="#nb-10">10</a> monta esse t
 <section class="md pegadinha"><p><strong>3. O valor do enum é um formato gravado.</strong> Ele aparece no prompt, no JSON e em logs. Trocar <code>&quot;preco&quot;</code> por <code>&quot;preço&quot;</code> &quot;só para
 ficar bonito&quot; quebra a leitura de tudo que já foi salvo:</p>
 </section>
-<div class="celula pegadinha"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[10]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="k">class</span><span class="w"> </span><span class="nc">IntencaoRenomeada</span><span class="p">(</span><span class="n">StrEnum</span><span class="p">):</span>
+<div class="celula pegadinha"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[12]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="k">class</span><span class="w"> </span><span class="nc">IntencaoRenomeada</span><span class="p">(</span><span class="n">StrEnum</span><span class="p">):</span>
     <span class="n">PRECO</span> <span class="o">=</span> <span class="s2">"preço"</span>
 
 
@@ -2093,7 +2100,7 @@ ficar bonito&quot; quebra a leitura de tudo que já foi salvo:</p>
 <p><strong>4. Valor desconhecido derruba a classificação inteira.</strong> Se o modelo inventar <code>&quot;intencao&quot;: &quot;receita_doce&quot;</code>, a validação falha
 e o pedido some. Às vezes é melhor aceitar e mandar para uma rota segura — o avançado mostra o enum com <code>DESCONHECIDO</code>.</p>
 </section>
-<div class="celula pegadinha"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[11]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="k">try</span><span class="p">:</span>
+<div class="celula pegadinha"><div class="cab"><button class="dobrar" aria-expanded="true">código</button><span class="exec">[13]</span><button class="copiar">copiar</button></div><pre class="codigo"><code><span class="k">try</span><span class="p">:</span>
     <span class="n">Classificacao</span><span class="o">.</span><span class="n">model_validate_json</span><span class="p">(</span><span class="s1">'{"intencao": "receita_doce", "confianca": 0.9}'</span><span class="p">)</span>
 <span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
     <span class="n">show</span><span class="p">(</span><span class="sa">f</span><span class="s2">"ValidationError: </span><span class="si">{</span><span class="n">ex</span><span class="o">.</span><span class="n">errors</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s1">'msg'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>

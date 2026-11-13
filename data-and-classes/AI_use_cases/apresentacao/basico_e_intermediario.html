@@ -375,7 +375,7 @@ fermento biológico seco: 10 g
   <h2>O contrato garante a forma, não o vocabulário</h2>
   <ol>
     <li><strong><code>description</code> é pedido, não regra.</strong> Com <code>unidade: str</code>, passa <code>['cups', 'tablespoon']</code> <span class="marca construido">construído</span>.</li>
-    <li><strong>Texto em volta do JSON</strong> ainda quebra o caminho do schema no prompt (<code>json_invalid</code>). Um <code>extrair_json</code> que pega da primeira <code>{</code> à última <code>}</code> resolve a maioria dos casos.</li>
+    <li><strong>Texto em volta do JSON</strong> ainda quebra o caminho do schema no prompt (<code>json_invalid</code>). Recortar da primeira <code>{</code> à última <code>}</code> falha com prosa que tem chaves e transforma uma lista solta no primeiro item, sem erro. A saída é um <strong>tipo de borda</strong>: <code>TypeAdapter(Annotated[Json[Modelo], BeforeValidator(extrair_json)])</code>, com <code>extrair_json</code> decodificando (<code>raw_decode</code>) em vez de recortar. Texto entra, objeto validado sai; a aplicação não toca em texto.</li>
   </ol>
   <p class="gancho">Falta fechar o vocabulário de cada campo.</p>
 </section>

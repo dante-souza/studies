@@ -154,8 +154,10 @@ fermento biológico seco: 10 g
 ## 8. Notebook 02 — o que quebra
 
 1. **`description` é pedido, não regra.** `unidade: str` aceita `['cups', 'tablespoon']` (**construído**).
-2. **Texto em volta do JSON** continua quebrando o caminho 2.1 (`json_invalid`). Um `extrair_json` simples
-   (da primeira `{` à última `}`) resolve a maioria dos casos.
+2. **Texto em volta do JSON** continua quebrando o caminho 2.1 (`json_invalid`). Recortar da primeira `{` à última `}`
+   falha com prosa que tem chaves e transforma uma lista solta no primeiro item, sem erro. A saída é um **tipo de borda**:
+   `TypeAdapter(Annotated[Json[Modelo], BeforeValidator(extrair_json)])`, com `extrair_json` decodificando
+   (`raw_decode`) em vez de recortar. Texto entra, objeto validado sai; a aplicação não toca em texto.
 
 ➡️ O contrato garante **forma**. Falta fechar o **vocabulário**.
 

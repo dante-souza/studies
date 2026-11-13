@@ -39,7 +39,10 @@ Resumo para revisão rápida (detalhes nos casos acima).
 | YAML | `no`/`off` → `False`, `3.10` → `3.1` **(V)** | aspas, `safe_load` |
 | Números | float para dinheiro **(V)** | `Decimal(str(x))` |
 | Números | `"1.5"` → `15` em parser BR **(V)** | regex estrita |
-| LLM | JSON com cerca/texto **(R)** | `extrair_json` |
+| LLM | JSON com cerca/texto **(R)** | tipo de borda `saida_llm(Modelo)` |
+| LLM | recorte `{`…`}` quebra com chaves na prosa e vira lista solta em `dict` sem erro **(V)** | decodificar com `raw_decode` |
+| LLM | `json.loads` + `model_validate` com `strict=True` rejeita `date`/`Decimal` **(V)** | validar em modo JSON (`Json[...]`) |
+| LLM | dois JSONs na resposta: o primeiro vence **(V)** | um JSON só no prompt; validação recusa o exemplo |
 | LLM | quantidade não numérica **(R)** | decidir no contrato |
 | LLM | confiança não calibrada **(R)** | avaliação com gabarito |
 | LLM | nome não bate com a chave **(R)** | chaves canônicas, sinônimos |

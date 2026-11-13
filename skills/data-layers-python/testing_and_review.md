@@ -31,6 +31,7 @@
 - [ ] Closed vocabularies are enums; values treated as an external contract.
 - [ ] Normalization in `BeforeValidator`; rules in `AfterValidator`/`model_validator`.
 - [ ] Request-dependent rules use `context=` and fail without context.
+- [ ] LLM or API text only enters through a border type; no string slicing, no `text` passed along.
 - [ ] Money in `Decimal`, built from text.
 - [ ] Core in dataclasses; frozen where it does not change; internal collections protected.
 - [ ] Enum-keyed tables with coverage tests; `match` with `case _`.

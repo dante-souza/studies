@@ -31,7 +31,8 @@ def request_list(dish, servings, call_model, max_attempts=3) -> OrderResult:
 - Rules outside the contract: any path that creates the model skips the rules **(V)**.
 - Each attempt resends the whole conversation: the payload grows every round **(V)**.
 - Retry does not fix a bad request: validate the input first **(V)**.
-- `except ValidationError` before `except ValueError`: `ValidationError` is a subclass of `ValueError` **(V)**.
+- `except ValidationError` before `except ValueError`: `ValidationError` is a subclass of `ValueError` **(V)**. With the border type from
+  [case 01](01_llm_structured_output.md), "no JSON" already arrives as a `ValidationError` and one `except` is enough **(V)**.
 
 **Possibilities**
 - Move the rules into the contract with context ([case 06](06_contract_with_context.md)).

@@ -5,9 +5,10 @@ Igual ao `02_intermediario/contrato.py`, mais os enums criados no intermediário
 
 import json
 from enum import StrEnum
+from functools import lru_cache
 from typing import Annotated
 
-from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, Json, TypeAdapter
 
 
 class Unidade(StrEnum):
@@ -53,12 +54,33 @@ def prompt_com_schema(instrucao: str, modelo: type[BaseModel]) -> str:
     )
 
 
-def extrair_json(texto: str) -> str:
-    """Conteúdo entre a primeira '{' e a última '}'."""
-    inicio, fim = texto.find("{"), texto.rfind("}")
-    if inicio == -1 or fim == -1:
-        raise ValueError("nenhum objeto JSON na resposta")
-    return texto[inicio:fim + 1]
+def extrair_json(texto):
+    """Primeiro JSON (objeto ou lista) decodificável no texto, devolvido como texto, sem nada em volta.
+
+    Decodifica a partir de cada '{' ou '[' (json.JSONDecoder.raw_decode) em vez de recortar da primeira '{' até a
+    última '}': cercas, prosa com chaves e listas soltas não enganam. O que não é texto passa adiante sem mudança.
+    """
+    if not isinstance(texto, str):
+        return texto
+    decoder = json.JSONDecoder()
+    for inicio, caractere in enumerate(texto):
+        if caractere in "{[":
+            try:
+                _, fim = decoder.raw_decode(texto, inicio)
+            except json.JSONDecodeError:
+                continue
+            return texto[inicio:fim]
+    raise ValueError("nenhum JSON decodificável na resposta")
+
+
+@lru_cache(maxsize=None)
+def saida_llm(modelo: type) -> TypeAdapter:
+    """Tipo de borda: texto do LLM -> objeto validado. É o único lugar da aplicação onde existe texto.
+
+    Json[modelo] valida o texto JSON contra o modelo; o BeforeValidator tira antes o que vem em volta.
+    "Sem JSON" vira ValidationError como qualquer outro erro. Uso: saida_llm(Modelo).validate_python(texto, context=...).
+    """
+    return TypeAdapter(Annotated[Json[modelo], BeforeValidator(extrair_json)])
 
 
 class Ferramenta(StrEnum):  # 04

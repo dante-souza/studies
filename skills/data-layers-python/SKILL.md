@@ -64,6 +64,8 @@ the study modules.
 6. **A silent error is the worst error.** Prefer failing loudly (`'250 grams' * 2` gives `'250 grams250 grams'` with no error).
 7. **Immutable by default in the core.** `frozen=True`, and beware: it is shallow.
 8. **Every table keyed by an enum has a coverage test.**
+9. **Text only exists at the border, inside a type.** The application neither slices nor passes text along: a border type
+   (`TypeAdapter(Annotated[Json[Model], BeforeValidator(extract_json)])`) takes the text and returns the validated object.
 
 ```
           BORDER (untrusted)                          CORE (trusted)

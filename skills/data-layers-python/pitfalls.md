@@ -36,7 +36,10 @@ behavior, not tested in the study. Each pitfall is detailed in the matching use 
 | YAML | `no`/`off` → `False`, `3.10` → `3.1` **(V)** | quotes, `safe_load` |
 | Numbers | float for money **(V)** | `Decimal(str(x))` |
 | Numbers | `"1.5"` → `15` in a Brazilian-format parser **(V)** | strict regex |
-| LLM | JSON wrapped in a fence/text **(R)** | `extract_json` |
+| LLM | JSON wrapped in a fence/text **(R)** | border type `llm_output(Model)` |
+| LLM | slicing `{`…`}` breaks on braces in prose and turns a bare list into a `dict` with no error **(V)** | decode with `raw_decode` |
+| LLM | `json.loads` + `model_validate` with `strict=True` rejects `date`/`Decimal` **(V)** | validate in JSON mode (`Json[...]`) |
+| LLM | two JSONs in the response: the first one wins **(V)** | a single JSON in the prompt; validation rejects the example |
 | LLM | non-numeric quantity **(R)** | decide in the contract |
 | LLM | uncalibrated confidence **(R)** | evaluation with expected answers |
 | LLM | name does not match the key **(R)** | canonical keys, synonyms |

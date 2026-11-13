@@ -31,6 +31,7 @@
 - [ ] Vocabulários fechados são enums; valores tratados como contrato externo.
 - [ ] Normalização em `BeforeValidator`; regras em `AfterValidator`/`model_validator`.
 - [ ] Regras dependentes do pedido usam `context=` e falham sem contexto.
+- [ ] Texto de LLM ou API só entra por um tipo de borda; nenhum recorte de string, nenhum `texto` passado adiante.
 - [ ] Dinheiro em `Decimal`, construído de texto.
 - [ ] Núcleo em dataclasses; frozen onde não muda; coleções internas protegidas.
 - [ ] Tabelas por enum com teste de cobertura; `match` com `case _`.

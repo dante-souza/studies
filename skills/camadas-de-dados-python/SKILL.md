@@ -63,6 +63,8 @@ dos módulos de estudo.
 6. **Erro silencioso é o pior erro.** Prefira falhar alto (`'250 grams' * 2` dá `'250 grams250 grams'` sem erro).
 7. **Imutável por padrão no núcleo.** `frozen=True`, e cuidado: é raso.
 8. **Toda tabela indexada por enum tem teste de cobertura.**
+9. **Texto só existe na borda, dentro de um tipo.** A aplicação não recorta nem passa texto adiante: um tipo de borda
+   (`TypeAdapter(Annotated[Json[Modelo], BeforeValidator(extrair_json)])`) recebe o texto e devolve o objeto validado.
 
 ```
           BORDA (não confiável)                      NÚCLEO (confiável)

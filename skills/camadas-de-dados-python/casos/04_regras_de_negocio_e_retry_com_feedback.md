@@ -31,7 +31,8 @@ def pedir_lista(prato, porcoes, chamar_modelo, max_tentativas=3) -> ResultadoPed
 - Regras fora do contrato: qualquer caminho que crie o modelo pula as regras **(V)**.
 - Cada tentativa reenvia a conversa inteira: o tamanho enviado cresce a cada rodada **(V)**.
 - Retry não conserta pedido ruim: valide a entrada antes **(V)**.
-- `except ValidationError` antes de `except ValueError`: `ValidationError` é subclasse de `ValueError` **(V)**.
+- `except ValidationError` antes de `except ValueError`: `ValidationError` é subclasse de `ValueError` **(V)**. Com o tipo de
+  borda do [caso 01](01_saida_estruturada_de_llm.md), "sem JSON" já chega como `ValidationError` e um `except` basta **(V)**.
 
 **Possibilidades**
 - Levar as regras para dentro do contrato com contexto ([caso 06](06_contrato_com_contexto.md)).

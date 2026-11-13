@@ -30,7 +30,7 @@ class ListaComContexto(ListaDeCompras):
         self._custo = total
         return self
 
-lista = ListaComContexto.model_validate_json(texto, context=ctx)
+lista = saida_llm(ListaComContexto).validate_python(texto, context=ctx)   # tipo de borda do caso 01
 ```
 
 **Pegadinhas**

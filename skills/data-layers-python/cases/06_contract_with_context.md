@@ -31,7 +31,7 @@ class ShoppingListInContext(ShoppingList):
         self._cost = total
         return self
 
-shopping_list = ShoppingListInContext.model_validate_json(text, context=ctx)
+shopping_list = llm_output(ShoppingListInContext).validate_python(text, context=ctx)   # border type from case 01
 ```
 
 **Pitfalls**
